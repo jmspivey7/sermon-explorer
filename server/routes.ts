@@ -525,8 +525,52 @@ ${text.substring(0, 12000)}`,
     ],
     response_format: { type: "json_object" },
     temperature: 0.7,
+    max_tokens: 16384,
   });
-  const parsed = JSON.parse(response.choices[0].message.content || '{"scenes":[]}');
+
+  const raw = response.choices[0].message.content || '{"scenes":[]}';
+
+  if (response.choices[0].finish_reason === "length") {
+    console.warn("Scene generation response was truncated, retrying with fewer scenes...");
+    const retryResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
+
+For each scene, provide:
+- title: A short, engaging scene title
+- content: The core teaching content of this scene (1-2 paragraphs from the sermon)
+- scriptureRef: Any Bible verse referenced in this section
+- keyPoint: The single most important idea in this scene
+- emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
+- imagePrompt: A DALL-E prompt for a warm, child-friendly watercolor illustration. Soft watercolor, warm lighting, diverse characters, biblical setting, suitable for children ages 4-12. No text in images.
+- videoPrompt: A prompt for a 10-second animated video. Describe gentle motion: characters moving, light shifting, camera panning. Warm watercolor animation style, biblical setting, gentle animated storybook. Keep motion subtle and calming. No text.
+- animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
+
+Respond with JSON: { "scenes": [...] }`,
+        },
+        {
+          role: "user",
+          content: `Sermon title: ${analysis.title}
+Scripture: ${analysis.scripture}
+Themes: ${analysis.keyThemes?.join(", ")}
+
+Full sermon text:
+${text.substring(0, 8000)}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 16384,
+    });
+    const retryRaw = retryResponse.choices[0].message.content || '{"scenes":[]}';
+    const retryParsed = JSON.parse(retryRaw);
+    return retryParsed.scenes || [];
+  }
+
+  const parsed = JSON.parse(raw);
   return parsed.scenes || [];
 }
 
