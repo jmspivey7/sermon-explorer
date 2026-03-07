@@ -16,6 +16,7 @@
     "lucide-react": "^0.468.0",
     "mammoth": "^1.8.0",
     "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.1.6",
     "openai": "^4.77.3",
     "pdf-parse": "^1.1.1",
     "react": "^18.3.1",
