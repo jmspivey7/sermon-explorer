@@ -304,7 +304,7 @@ async function startVideoGeneration(prompt: string, model?: string): Promise<str
   return data.id;
 }
 
-async function checkVideoStatus(videoId: string): Promise<{ status: string; url: string | null; progress?: number }> {
+async function checkVideoStatus(videoId: string): Promise<{ status: string; videoId: string; progress?: number }> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is required");
 
@@ -322,18 +322,28 @@ async function checkVideoStatus(videoId: string): Promise<{ status: string; url:
   const data = await response.json() as any;
 
   if (data.status === "completed") {
-    const videoUrl = data.download_url || null;
-    return { status: "ready", url: videoUrl, progress: 100 };
+    return { status: "ready", videoId, progress: 100 };
   } else if (data.status === "failed") {
-    return { status: "failed", url: null };
+    return { status: "failed", videoId };
   }
 
-  return { status: "generating", url: null, progress: data.progress || 0 };
+  return { status: "generating", videoId, progress: data.progress || 0 };
 }
 
-async function downloadVideo(downloadUrl: string, filename: string): Promise<string> {
-  const response = await fetch(downloadUrl);
-  if (!response.ok) throw new Error(`Failed to download video: ${response.status}`);
+async function downloadVideoContent(videoId: string, filename: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY is required");
+
+  const response = await fetch(`https://api.openai.com/v1/videos/${videoId}/content`, {
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Video download failed: ${response.status} - ${errorText}`);
+  }
 
   const buffer = Buffer.from(await response.arrayBuffer());
   const filePath = path.join(VIDEOS_DIR, filename);
@@ -352,8 +362,8 @@ async function generateVideo(prompt: string, model?: string): Promise<{ url: str
     attempts++;
 
     const result = await checkVideoStatus(videoId);
-    if (result.status === "ready" && result.url) {
-      const localPath = await downloadVideo(result.url, `${videoId}.mp4`);
+    if (result.status === "ready") {
+      const localPath = await downloadVideoContent(videoId, `${videoId}.mp4`);
       return { url: localPath };
     }
     if (result.status === "failed") {
@@ -376,8 +386,8 @@ function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: str
         const result = await checkVideoStatus(videoId);
         const job = videoGenerationJobs.get(trackingKey);
 
-        if (result.status === "ready" && result.url) {
-          const localPath = await downloadVideo(result.url, `${sermonId}-scene${sceneIndex}.mp4`);
+        if (result.status === "ready") {
+          const localPath = await downloadVideoContent(videoId, `${sermonId}-scene${sceneIndex}.mp4`);
 
           if (job) {
             job.status = "ready";
