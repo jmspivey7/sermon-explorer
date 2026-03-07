@@ -44,7 +44,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   const [showButtons, setShowButtons] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(scene.videoUrl || null);
-  const [videoLoading, setVideoLoading] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(!scene.videoUrl && scene.videoStatus === "generating");
   const [videoBuffering, setVideoBuffering] = useState(false);
   const [narrationStarted, setNarrationStarted] = useState(false);
 
@@ -101,7 +101,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     setShowButtons(false);
     setNarrationStarted(false);
     setVideoUrl(scene.videoUrl || null);
-    setVideoLoading(false);
+    setVideoLoading(!scene.videoUrl && scene.videoStatus === "generating");
     setVideoBuffering(false);
 
     const contentTimer = setTimeout(() => setShowContent(true), 1000);
@@ -123,12 +123,23 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   }, [sceneIndex]);
 
   useEffect(() => {
+    if (scene.videoUrl && scene.videoStatus === "ready") {
+      if (!videoUrl || videoUrl !== scene.videoUrl) {
+        console.log(`[SceneViewer] Scene ${sceneIndex}: video ready from props: ${scene.videoUrl}`);
+        setVideoUrl(scene.videoUrl);
+        setVideoLoading(false);
+      }
+      return;
+    }
+
     if (!scene.videoUrl && scene.videoStatus === "generating" && sermonId) {
       setVideoLoading(true);
+      console.log(`[SceneViewer] Scene ${sceneIndex}: starting video poll`);
       const interval = setInterval(async () => {
         try {
           const res = await fetch(`/api/sermons/${sermonId}/scenes/${sceneIndex}/video-status`);
           const data = await res.json();
+          console.log(`[SceneViewer] Scene ${sceneIndex}: poll result: ${data.videoStatus}, url: ${data.videoUrl}`);
           if (data.videoStatus === "ready" && data.videoUrl) {
             setVideoUrl(data.videoUrl);
             setVideoLoading(false);
@@ -145,7 +156,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [scene.videoUrl, scene.videoStatus, sermonId, sceneIndex]);
+  }, [scene.videoUrl, scene.videoStatus, sermonId, sceneIndex, videoUrl]);
 
   useEffect(() => {
     if (hasVideo) {
@@ -198,19 +209,32 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
           <>
             <video
               ref={videoRef}
+              key={videoUrl}
               src={videoUrl!}
               className="w-full h-full object-cover"
               autoPlay
-              muted={isMuted}
+              muted
+              loop
               playsInline
+              poster={scene.imageUrl || undefined}
               onEnded={handleVideoEnded}
-              onError={() => setVideoDone(true)}
+              onLoadedData={() => {
+                console.log(`[SceneViewer] Video loaded for scene ${sceneIndex}`);
+                setVideoBuffering(false);
+                if (videoRef.current) {
+                  videoRef.current.muted = isMuted;
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              onError={(e) => {
+                console.error(`[SceneViewer] Video error for scene ${sceneIndex}:`, e);
+                setVideoUrl(null);
+                setVideoDone(true);
+              }}
               onWaiting={() => setVideoBuffering(true)}
               onPlaying={() => setVideoBuffering(false)}
               onCanPlay={() => setVideoBuffering(false)}
-            >
-              <source src={videoUrl!} type="video/mp4" />
-            </video>
+            />
             {videoBuffering && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <Loader2 className="w-8 h-8 text-white animate-spin" />

@@ -189,8 +189,6 @@ export async function registerRoutes(server: Server, app: Express) {
     }
   });
 
-  app.use("/generated", express.static(path.resolve("generated")));
-
   // Generate video for a scene (on-demand via Sora 2 API)
   app.post("/api/generate-video", async (req, res) => {
     try {

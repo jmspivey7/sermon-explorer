@@ -86,8 +86,10 @@ script/
 - OpenAI client is lazily instantiated to allow server startup without API key
 - `__dirname` polyfill added to vite.config.ts and server/vite.ts for ESM compatibility
 - Sora 2 API: `POST https://api.openai.com/v1/videos` with model `sora-2` or `sora-2-pro`
-- Video status check: `GET https://api.openai.com/v1/videos/{id}` — returns `download_url` when completed
-- Video generation runs in background with polling; frontend polls for completion
+- Video status check: `GET https://api.openai.com/v1/videos/{id}` — returns status/progress (no download_url field)
+- Video download: `GET https://api.openai.com/v1/videos/{id}/content` — returns MP4 binary stream when status is "completed"
+- Video generation runs in background with polling; frontend auto-refetches sermon data every 5s while videos generating
+- Viewer useQuery has refetchInterval to keep scene props updated with latest videoUrl values
 - Quiz data format: handles both flat array and `{ questions: [...] }` object format
 - Discussion prompts format: handles both flat array and `{ prompts: [...] }` object format
 - Vite config has `@assets` alias pointing to `attached_assets/` directory
