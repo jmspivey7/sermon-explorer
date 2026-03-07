@@ -24,7 +24,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <img src={cdmLogo} alt="CDM Discipleship Ministries" className="h-16 mx-auto mb-4" />
+          <img src={cdmLogo} alt="CDM Discipleship Ministries" className="h-[115px] mx-auto mb-4" />
           <h1 className="font-display text-5xl font-extrabold text-white mb-3">
             Sermon Explorer
           </h1>
