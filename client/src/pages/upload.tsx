@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Upload, FileText, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Loader2, CheckCircle, AlertCircle, Film } from "lucide-react";
+
+type VideoModel = "sora-2" | "sora-2-pro";
 
 export default function UploadPage() {
   const [, setLocation] = useLocation();
@@ -13,6 +15,7 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState("");
   const [error, setError] = useState("");
+  const [videoModel, setVideoModel] = useState<VideoModel>("sora-2");
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -27,6 +30,7 @@ export default function UploadPage() {
     try {
       const formData = new FormData();
       formData.append("sermon", file);
+      formData.append("videoModel", videoModel);
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
@@ -105,15 +109,46 @@ export default function UploadPage() {
             </div>
 
             {file && (
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleUpload}
-                className="w-full mt-6 child-button bg-se-teal text-se-navy"
-              >
-                Process Sermon
-              </motion.button>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <div className="mt-6 bg-white/5 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Film className="w-4 h-4 text-se-teal" />
+                    <h3 className="font-display font-bold text-white text-sm">Video Quality</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setVideoModel("sora-2")}
+                      className={`rounded-xl p-3 text-left transition-all border ${
+                        videoModel === "sora-2"
+                          ? "bg-se-teal/20 border-se-teal/60 text-white"
+                          : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                      }`}
+                    >
+                      <p className="font-display font-bold text-sm">Standard</p>
+                      <p className="text-xs mt-0.5 opacity-70">Sora 2 — Fast</p>
+                    </button>
+                    <button
+                      onClick={() => setVideoModel("sora-2-pro")}
+                      className={`rounded-xl p-3 text-left transition-all border ${
+                        videoModel === "sora-2-pro"
+                          ? "bg-se-amber/20 border-se-amber/60 text-white"
+                          : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                      }`}
+                    >
+                      <p className="font-display font-bold text-sm">Pro</p>
+                      <p className="text-xs mt-0.5 opacity-70">Sora 2 Pro — Best</p>
+                    </button>
+                  </div>
+                </div>
+
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleUpload}
+                  className="w-full mt-4 child-button bg-se-teal text-se-navy"
+                >
+                  Process Sermon
+                </motion.button>
+              </motion.div>
             )}
 
             <div className="mt-8 bg-white/5 rounded-2xl p-5">

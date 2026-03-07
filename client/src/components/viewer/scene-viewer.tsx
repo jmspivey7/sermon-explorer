@@ -45,6 +45,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   const [isMuted, setIsMuted] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(scene.videoUrl || null);
   const [videoLoading, setVideoLoading] = useState(false);
+  const [videoBuffering, setVideoBuffering] = useState(false);
   const [narrationStarted, setNarrationStarted] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -101,6 +102,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     setNarrationStarted(false);
     setVideoUrl(scene.videoUrl || null);
     setVideoLoading(false);
+    setVideoBuffering(false);
 
     const contentTimer = setTimeout(() => setShowContent(true), 1000);
 
@@ -193,34 +195,50 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     <div className="pb-24 relative">
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-se-navy">
         {hasVideo ? (
-          <video
-            ref={videoRef}
-            src={videoUrl!}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted={isMuted}
-            playsInline
-            onEnded={handleVideoEnded}
-            onError={() => setVideoDone(true)}
-          />
-        ) : scene.imageUrl ? (
-          <img
-            src={scene.imageUrl}
-            alt={scene.title}
-            className={`w-full h-full object-cover ${kenBurnsClass}`}
-          />
+          <>
+            <video
+              ref={videoRef}
+              src={videoUrl!}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted={isMuted}
+              playsInline
+              onEnded={handleVideoEnded}
+              onError={() => setVideoDone(true)}
+              onWaiting={() => setVideoBuffering(true)}
+              onPlaying={() => setVideoBuffering(false)}
+              onCanPlay={() => setVideoBuffering(false)}
+            >
+              <source src={videoUrl!} type="video/mp4" />
+            </video>
+            {videoBuffering && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <Loader2 className="w-8 h-8 text-white animate-spin" />
+              </div>
+            )}
+          </>
         ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center ${kenBurnsClass}`}>
-            <div className="text-center">
-              <span className="text-7xl block mb-2">{icon}</span>
-              {videoLoading && (
-                <div className="flex items-center gap-2 mt-3">
-                  <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
-                  <p className="text-white/40 font-display text-xs">Creating animation...</p>
+          <>
+            {scene.imageUrl ? (
+              <img
+                src={scene.imageUrl}
+                alt={scene.title}
+                className={`w-full h-full object-cover ${kenBurnsClass}`}
+              />
+            ) : (
+              <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center ${kenBurnsClass}`}>
+                <span className="text-7xl block mb-2">{icon}</span>
+              </div>
+            )}
+            {videoLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-se-navy/80 backdrop-blur-sm rounded-2xl px-5 py-3 flex items-center gap-3">
+                  <Loader2 className="w-5 h-5 text-se-teal animate-spin" />
+                  <span className="text-white/80 font-display text-sm">Generating animation...</span>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-se-navy via-se-navy/60 to-transparent" />
@@ -241,12 +259,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
           )}
         </button>
 
-        {videoLoading && scene.imageUrl && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-se-navy/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2">
-            <Loader2 className="w-3 h-3 text-se-amber animate-spin" />
-            <span className="text-white/60 text-xs font-display">Animation loading...</span>
-          </div>
-        )}
+        
       </div>
 
       <div className="px-5 -mt-10 relative z-10">

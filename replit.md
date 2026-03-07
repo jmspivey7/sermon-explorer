@@ -7,7 +7,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
-- **AI**: OpenAI (GPT-4o for content, DALL-E 3 for images, Sora for video animations, TTS for narration)
+- **AI**: OpenAI (GPT-4o for content, DALL-E 3 for images, Sora 2 for animated MP4 videos, TTS for narration)
 
 ## Project Structure
 
@@ -18,13 +18,16 @@ client/          - React frontend (Vite root)
     components/  - UI components
       viewer/    - SceneViewer, SceneQuiz, DiscussionTime, StorySetup, FinalSummary
     lib/         - Query client and utilities
+  public/        - Static assets (cdm-logo.webp)
 server/          - Express backend
   index.ts       - Server entry point (port 5000, host 0.0.0.0)
-  routes.ts      - API routes, AI processing pipeline, Sora video generation
+  routes.ts      - API routes, AI processing pipeline, Sora 2 video generation
   vite.ts        - Vite dev server middleware integration
   static.ts      - Static file serving for production
 shared/          - Shared types and demo data
   demo-data.ts   - Pre-loaded demo sermon (Luke 11)
+generated/       - Runtime-generated content
+  videos/        - Downloaded MP4 videos from Sora 2 (served via Express static)
 script/
   build.ts       - Production build script
 ```
@@ -38,13 +41,17 @@ script/
 ## Environment Variables
 
 - `OPENAI_API_KEY` (secret) — Required for AI features (sermon processing, image generation, video generation, TTS)
+- `SORA_MODEL` (optional) — Video model to use: `sora-2` (default) or `sora-2-pro`
+- `SORA_VIDEO_SECONDS` (optional) — Video duration in seconds, default `10`
 
 ## Key Features
 
 - Upload sermons as .docx, .pdf, or .txt files
-- AI pipeline: analyze → scene breakdown → age-adaptive narratives → DALL-E illustrations → Sora video animations → quizzes → discussion prompts
-- Auto-playing animated video scenes (10-15 seconds via OpenAI Sora API)
+- AI pipeline: analyze → scene breakdown → age-adaptive narratives → DALL-E illustrations → Sora 2 animated MP4 videos → quizzes → discussion prompts
+- True animated video scenes via OpenAI Sora 2 API (real motion, not Ken Burns effects)
+- Videos downloaded and cached locally in `generated/videos/` for persistence
 - Auto-narration via TTS when each scene loads
+- Configurable video quality: Standard (sora-2) or Pro (sora-2-pro) — selectable on upload page
 - Three age groups: Young (4-6), Older (7-10), Family (11+)
 - Fixed bottom action bar with Next Scene / Skip buttons
 - Demo sermon pre-loaded (Luke 11:37-54)
@@ -54,20 +61,33 @@ script/
 
 - `GET /api/sermons` - List all sermons
 - `GET /api/sermons/:id` - Get sermon details with scenes
-- `POST /api/upload` - Upload sermon file (.docx, .pdf, .txt)
+- `POST /api/upload` - Upload sermon file (.docx, .pdf, .txt) with optional `videoModel` field
 - `POST /api/tts` - Generate TTS audio
 - `POST /api/generate-image` - Generate DALL-E image
-- `POST /api/generate-video` - Generate Sora video (synchronous, waits for completion)
+- `POST /api/generate-video` - Generate Sora 2 video (synchronous, waits for completion)
 - `POST /api/generate-video-async` - Start async video generation
 - `GET /api/video-status/:trackingKey` - Check video generation status
 - `GET /api/sermons/:id/scenes/:sceneIndex/video-status` - Scene video status
+- `GET /generated/videos/*` - Serve cached video files
+
+## Video Generation Flow
+
+1. Upload endpoint receives sermon + optional `videoModel` parameter
+2. Pipeline generates DALL-E images first (fast, used as fallback)
+3. Sora 2 video generation starts in background for each scene
+4. Videos are polled every 15 seconds until completion
+5. Completed MP4s are downloaded from OpenAI and saved to `generated/videos/`
+6. Frontend polls for video status; auto-plays video when ready
+7. Ken Burns still-image effect used only as fallback when no video is available
 
 ## Notes
 
 - `nanoid` is a transitive dependency (used in server/vite.ts for cache busting)
 - OpenAI client is lazily instantiated to allow server startup without API key
 - `__dirname` polyfill added to vite.config.ts and server/vite.ts for ESM compatibility
-- Sora API is called via direct REST (not via SDK) since the SDK version doesn't include video support
+- Sora 2 API: `POST https://api.openai.com/v1/videos` with model `sora-2` or `sora-2-pro`
+- Video status check: `GET https://api.openai.com/v1/videos/{id}` — returns `download_url` when completed
 - Video generation runs in background with polling; frontend polls for completion
 - Quiz data format: handles both flat array and `{ questions: [...] }` object format
 - Discussion prompts format: handles both flat array and `{ prompts: [...] }` object format
+- Vite config has `@assets` alias pointing to `attached_assets/` directory

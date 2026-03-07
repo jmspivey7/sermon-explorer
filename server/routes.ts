@@ -103,10 +103,12 @@ export async function registerRoutes(server: Server, app: Express) {
         createdAt: new Date().toISOString(),
       });
 
+      const videoModel = req.body?.videoModel || undefined;
+
       res.json({ sermonId, status: "processing", message: "Sermon uploaded. Processing started." });
 
       // Run pipeline in background
-      processSermon(sermonId, text).catch((err) => {
+      processSermon(sermonId, text, videoModel).catch((err) => {
         console.error("Pipeline error:", err);
         const sermon = processedSermons.get(sermonId);
         if (sermon) {
@@ -187,13 +189,15 @@ export async function registerRoutes(server: Server, app: Express) {
     }
   });
 
-  // Generate video for a scene (on-demand via Sora API)
+  app.use("/generated", express.static(path.resolve("generated")));
+
+  // Generate video for a scene (on-demand via Sora 2 API)
   app.post("/api/generate-video", async (req, res) => {
     try {
-      const { prompt, sceneIndex, sermonId } = req.body;
+      const { prompt, sceneIndex, sermonId, model } = req.body;
       if (!prompt) return res.status(400).json({ message: "prompt is required" });
 
-      const videoResult = await generateVideo(prompt);
+      const videoResult = await generateVideo(prompt, model);
 
       if (sermonId && sceneIndex !== undefined) {
         const sermon = processedSermons.get(sermonId);
@@ -213,10 +217,10 @@ export async function registerRoutes(server: Server, app: Express) {
   // Start async video generation for a scene
   app.post("/api/generate-video-async", async (req, res) => {
     try {
-      const { prompt, sceneIndex, sermonId } = req.body;
+      const { prompt, sceneIndex, sermonId, model } = req.body;
       if (!prompt) return res.status(400).json({ message: "prompt is required" });
 
-      const videoId = await startVideoGeneration(prompt);
+      const videoId = await startVideoGeneration(prompt, model);
       const trackingKey = `${sermonId}-${sceneIndex}`;
       videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
 
@@ -258,29 +262,34 @@ export async function registerRoutes(server: Server, app: Express) {
 }
 
 // ============================================
-// VIDEO GENERATION (Sora API via REST)
+// VIDEO GENERATION (OpenAI Videos API - Sora 2)
 // ============================================
+
+const SORA_MODEL = process.env.SORA_MODEL || "sora-2";
+const SORA_VIDEO_SECONDS = parseInt(process.env.SORA_VIDEO_SECONDS || "10", 10);
+const VIDEOS_DIR = path.resolve("generated", "videos");
+fs.mkdirSync(VIDEOS_DIR, { recursive: true });
 
 const videoGenerationJobs: Map<string, { videoId: string; status: string; url: string | null }> = new Map();
 
-async function startVideoGeneration(prompt: string): Promise<string> {
+async function startVideoGeneration(prompt: string, model?: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is required for video generation");
 
-  const response = await fetch("https://api.openai.com/v1/video/generations", {
+  const useModel = model || SORA_MODEL;
+  console.log(`Starting video generation with model=${useModel}, seconds=${SORA_VIDEO_SECONDS}`);
+
+  const response = await fetch("https://api.openai.com/v1/videos", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "sora",
-      input: [{
-        type: "text",
-        text: prompt,
-      }],
+      model: useModel,
+      prompt: prompt,
       size: "1280x720",
-      duration: 10,
+      seconds: SORA_VIDEO_SECONDS,
     }),
   });
 
@@ -291,14 +300,15 @@ async function startVideoGeneration(prompt: string): Promise<string> {
   }
 
   const data = await response.json() as any;
+  console.log(`Video job created: ${data.id}, status: ${data.status}`);
   return data.id;
 }
 
-async function checkVideoStatus(videoId: string): Promise<{ status: string; url: string | null }> {
+async function checkVideoStatus(videoId: string): Promise<{ status: string; url: string | null; progress?: number }> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("OPENAI_API_KEY is required");
 
-  const response = await fetch(`https://api.openai.com/v1/video/generations/${videoId}`, {
+  const response = await fetch(`https://api.openai.com/v1/videos/${videoId}`, {
     headers: {
       "Authorization": `Bearer ${apiKey}`,
     },
@@ -312,34 +322,46 @@ async function checkVideoStatus(videoId: string): Promise<{ status: string; url:
   const data = await response.json() as any;
 
   if (data.status === "completed") {
-    const videoUrl = data.output?.url || data.output?.[0]?.url || null;
-    return { status: "ready", url: videoUrl };
+    const videoUrl = data.download_url || null;
+    return { status: "ready", url: videoUrl, progress: 100 };
   } else if (data.status === "failed") {
     return { status: "failed", url: null };
   }
 
-  return { status: "generating", url: null };
+  return { status: "generating", url: null, progress: data.progress || 0 };
 }
 
-async function generateVideo(prompt: string): Promise<{ url: string }> {
-  const videoId = await startVideoGeneration(prompt);
+async function downloadVideo(downloadUrl: string, filename: string): Promise<string> {
+  const response = await fetch(downloadUrl);
+  if (!response.ok) throw new Error(`Failed to download video: ${response.status}`);
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  const filePath = path.join(VIDEOS_DIR, filename);
+  fs.writeFileSync(filePath, buffer);
+  console.log(`Video downloaded and saved: ${filePath} (${(buffer.length / 1024 / 1024).toFixed(1)}MB)`);
+  return `/generated/videos/${filename}`;
+}
+
+async function generateVideo(prompt: string, model?: string): Promise<{ url: string }> {
+  const videoId = await startVideoGeneration(prompt, model);
 
   let attempts = 0;
   const maxAttempts = 60;
   while (attempts < maxAttempts) {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
     attempts++;
 
     const result = await checkVideoStatus(videoId);
     if (result.status === "ready" && result.url) {
-      return { url: result.url };
+      const localPath = await downloadVideo(result.url, `${videoId}.mp4`);
+      return { url: localPath };
     }
     if (result.status === "failed") {
       throw new Error("Video generation failed on Sora side");
     }
   }
 
-  throw new Error("Video generation timed out after 10 minutes");
+  throw new Error("Video generation timed out after 15 minutes");
 }
 
 function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: string, sceneIndex: number) {
@@ -347,7 +369,7 @@ function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: str
     let attempts = 0;
     const maxAttempts = 60;
     while (attempts < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await new Promise((resolve) => setTimeout(resolve, 15000));
       attempts++;
 
       try {
@@ -355,16 +377,18 @@ function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: str
         const job = videoGenerationJobs.get(trackingKey);
 
         if (result.status === "ready" && result.url) {
+          const localPath = await downloadVideo(result.url, `${sermonId}-scene${sceneIndex}.mp4`);
+
           if (job) {
             job.status = "ready";
-            job.url = result.url;
+            job.url = localPath;
           }
           const sermon = processedSermons.get(sermonId);
           if (sermon?.scenes?.[sceneIndex]) {
-            sermon.scenes[sceneIndex].videoUrl = result.url;
+            sermon.scenes[sceneIndex].videoUrl = localPath;
             sermon.scenes[sceneIndex].videoStatus = "ready";
           }
-          console.log(`Video ready for ${trackingKey}`);
+          console.log(`Video ready for ${trackingKey}: ${localPath}`);
           return;
         }
 
@@ -376,6 +400,10 @@ function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: str
           }
           console.error(`Video generation failed for ${trackingKey}`);
           return;
+        }
+
+        if (result.progress !== undefined) {
+          console.log(`Video ${trackingKey}: ${result.progress}% complete`);
         }
       } catch (err) {
         console.error(`Error polling video ${trackingKey}:`, err);
@@ -394,7 +422,7 @@ function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: str
 // PROCESSING PIPELINE
 // ============================================
 
-async function processSermon(sermonId: string, text: string) {
+async function processSermon(sermonId: string, text: string, videoModel?: string) {
   const sermon = processedSermons.get(sermonId)!;
 
   const updateProgress = (step: string, progress: number) => {
@@ -443,7 +471,7 @@ async function processSermon(sermonId: string, text: string) {
     const videoPrompt = scenes[i].videoPrompt || scenes[i].imagePrompt;
     try {
       scenes[i].videoStatus = "generating";
-      const videoId = await startVideoGeneration(videoPrompt);
+      const videoId = await startVideoGeneration(videoPrompt, videoModel);
       const trackingKey = `${sermonId}-${i}`;
       videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
       pollVideoCompletion(trackingKey, videoId, sermonId, i);
