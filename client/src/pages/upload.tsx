@@ -153,7 +153,7 @@ export default function UploadPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white font-display font-bold text-xl">{progress}%</span>
+                <span className="text-white font-display font-bold text-xl">{Math.round(progress)}%</span>
               </div>
             </div>
             <h2 className="font-display text-xl font-bold text-white mb-2">

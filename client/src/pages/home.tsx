@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { BookOpen, Upload, Sparkles, ChevronRight } from "lucide-react";
+import { BookOpen, Upload, ChevronRight } from "lucide-react";
+import cdmLogo from "@assets/Screenshot_2026-03-07_at_4.46.59_PM_1772923623508.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -23,11 +24,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-6 h-6 text-se-amber" />
-            <BookOpen className="w-8 h-8 text-se-teal" />
-            <Sparkles className="w-6 h-6 text-se-amber" />
-          </div>
+          <img src={cdmLogo} alt="CDM Discipleship Ministries" className="h-16 mx-auto mb-4" />
           <h1 className="font-display text-5xl font-extrabold text-white mb-3">
             Sermon Explorer
           </h1>
