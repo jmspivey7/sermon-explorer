@@ -9,7 +9,9 @@ interface Props {
 }
 
 export default function DiscussionTime({ scene, onComplete, isLastScene }: Props) {
-  const prompts = scene.discussionPrompts || [];
+  const rawPrompts = scene.discussionPrompts || [];
+  const promptObjects = Array.isArray(rawPrompts) ? rawPrompts : (rawPrompts.prompts || []);
+  const prompts = promptObjects.map((p: any) => (typeof p === "string" ? p : p.question || ""));
   const [revealedCount, setRevealedCount] = useState(1);
 
   function revealNext() {
@@ -18,18 +20,25 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
 
   if (prompts.length === 0) {
     return (
-      <div className="px-5 py-10 text-center">
+      <div className="px-5 py-10 text-center pb-24">
         <p className="text-white/60 font-display mb-4">No discussion prompts for this scene</p>
-        <button onClick={onComplete} className="text-se-teal font-display font-bold underline">
-          Continue
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={onComplete}
+            className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
+                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+          >
+            <span className="font-display font-bold text-se-navy text-sm">Continue</span>
+            <ChevronRight className="w-4 h-4 text-se-navy" />
+          </motion.button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-5 py-6">
-      {/* Header */}
+    <div className="px-5 py-6 pb-28">
       <div className="text-center mb-6">
         <div className="w-16 h-16 rounded-full bg-se-coral/20 flex items-center justify-center mx-auto mb-3">
           <Users className="w-8 h-8 text-se-coral" />
@@ -42,7 +51,6 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         </p>
       </div>
 
-      {/* Scene context */}
       <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
         <p className="text-se-teal font-display text-xs font-bold mb-1">FROM THIS SCENE</p>
         <p className="text-white font-display font-semibold text-sm">{scene.title}</p>
@@ -51,7 +59,6 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         )}
       </div>
 
-      {/* Discussion Prompts */}
       <div className="space-y-4 mb-6">
         {prompts.slice(0, revealedCount).map((prompt: string, idx: number) => (
           <motion.div
@@ -78,7 +85,6 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         ))}
       </div>
 
-      {/* Reveal more button */}
       {revealedCount < prompts.length && (
         <motion.button
           initial={{ opacity: 0 }}
@@ -96,7 +102,6 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         </motion.button>
       )}
 
-      {/* Encouragement */}
       <div className="bg-se-teal/10 border border-se-teal/20 rounded-2xl p-4 mb-6">
         <p className="text-white/70 font-story text-sm leading-relaxed text-center">
           Take your time with these questions. There are no wrong answers — the goal
@@ -104,18 +109,19 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         </p>
       </div>
 
-      {/* Continue Button */}
-      <motion.button
-        whileTap={{ scale: 0.98 }}
-        onClick={onComplete}
-        className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                   hover:bg-se-teal/90 transition-all"
-      >
-        <span className="font-display font-bold text-se-navy text-sm">
-          {isLastScene ? "See Your Results" : "Next Scene"}
-        </span>
-        <ChevronRight className="w-4 h-4 text-se-navy" />
-      </motion.button>
+      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={onComplete}
+          className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
+                     hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+        >
+          <span className="font-display font-bold text-se-navy text-sm">
+            {isLastScene ? "See Your Results" : "Next Scene"}
+          </span>
+          <ChevronRight className="w-4 h-4 text-se-navy" />
+        </motion.button>
+      </div>
     </div>
   );
 }

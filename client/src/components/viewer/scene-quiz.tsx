@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, SkipForward, Trophy, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Trophy, Sparkles, ChevronRight } from "lucide-react";
 import type { AgeGroup } from "@/pages/viewer";
 
 interface Props {
@@ -11,8 +11,8 @@ interface Props {
 }
 
 export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props) {
-  const quiz = scene.quiz || [];
-  // Filter questions for this age group
+  const rawQuiz = scene.quiz || [];
+  const quiz = Array.isArray(rawQuiz) ? rawQuiz : (rawQuiz.questions || []);
   const questions = quiz.filter(
     (q: any) => q.ageGroup === ageGroup || q.ageGroup === "all"
   );
@@ -24,13 +24,19 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
   const [answered, setAnswered] = useState(false);
 
   if (questions.length === 0) {
-    // No quiz for this age group – skip
     return (
-      <div className="px-5 py-10 text-center">
+      <div className="px-5 py-10 text-center pb-24">
         <p className="text-white/60 font-display mb-4">No quiz for this scene</p>
-        <button onClick={onSkip} className="text-se-teal font-display font-bold underline">
-          Continue
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+          <button
+            onClick={onSkip}
+            className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
+                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+          >
+            <span className="font-display font-bold text-se-navy text-sm">Continue</span>
+            <ChevronRight className="w-4 h-4 text-se-navy" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -65,24 +71,17 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
   const optionLetters = ["A", "B", "C", "D"];
 
   return (
-    <div className="px-5 py-6">
-      {/* Quiz Header */}
+    <div className="px-5 py-6 pb-28">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-se-amber" />
           <span className="font-display font-bold text-white text-sm">Quiz Time!</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-white/40 font-display text-xs">
-            {currentQ + 1} / {total}
-          </span>
-          <button onClick={onSkip} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-            <SkipForward className="w-4 h-4 text-white/40" />
-          </button>
-        </div>
+        <span className="text-white/40 font-display text-xs">
+          {currentQ + 1} / {total}
+        </span>
       </div>
 
-      {/* Progress dots */}
       <div className="flex gap-1.5 mb-6">
         {questions.map((_: any, i: number) => (
           <div
@@ -94,7 +93,6 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
         ))}
       </div>
 
-      {/* Question */}
       <motion.div
         key={currentQ}
         initial={{ opacity: 0, y: 10 }}
@@ -104,7 +102,6 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           {q.question}
         </p>
 
-        {/* Options */}
         <div className="space-y-3 mb-6">
           {q.options.map((option: string, idx: number) => {
             let bg = "bg-white/8 border-white/15";
@@ -148,7 +145,6 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           })}
         </div>
 
-        {/* Result & Explanation */}
         {showResult && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
@@ -179,23 +175,34 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             </div>
           </motion.div>
         )}
+      </motion.div>
 
-        {/* Next Button */}
-        {showResult && (
+      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+        {showResult ? (
           <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleNext}
             className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                       hover:bg-se-teal/90 transition-all"
+                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
           >
             <span className="font-display font-bold text-se-navy text-sm">
               {isLast ? "See Discussion" : "Next Question"}
             </span>
+            <ChevronRight className="w-4 h-4 text-se-navy" />
           </motion.button>
+        ) : (
+          <button
+            onClick={onSkip}
+            className="w-full py-2 text-center"
+          >
+            <span className="font-display text-xs text-white/30 hover:text-white/50 transition-colors">
+              Skip quiz
+            </span>
+          </button>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }

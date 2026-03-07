@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Volume2, ChevronRight, SkipForward, BookOpen } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight, BookOpen, Volume2, VolumeX, Loader2 } from "lucide-react";
 import type { AgeGroup } from "@/pages/viewer";
 import { apiRequest } from "@/lib/queryClient";
 
 interface Props {
   scene: any;
   sceneIndex: number;
+  totalScenes: number;
   ageGroup: AgeGroup;
   userName: string;
+  sermonId: string;
   onComplete: () => void;
   onSkip: () => void;
 }
 
-// Placeholder illustration colors based on scene emotion
 const EMOTION_GRADIENTS: Record<string, string> = {
   curiosity: "from-amber-800 via-teal-900 to-blue-900",
   surprise: "from-yellow-800 via-orange-900 to-red-900",
@@ -36,81 +37,219 @@ const EMOTION_ICONS: Record<string, string> = {
   transformation: "🦋",
 };
 
-export default function SceneViewer({ scene, sceneIndex, ageGroup, userName, onComplete, onSkip }: Props) {
-  const [speaking, setSpeaking] = useState(false);
-  const [showText, setShowText] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, userName, sermonId, onComplete, onSkip }: Props) {
+  const [narrationDone, setNarrationDone] = useState(false);
+  const [videoDone, setVideoDone] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(scene.videoUrl || null);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [narrationStarted, setNarrationStarted] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const narrationAbortRef = useRef(false);
 
   const narrative = scene.narratives?.[ageGroup] || scene.content;
   const gradient = EMOTION_GRADIENTS[scene.emotion] || EMOTION_GRADIENTS.hope;
   const icon = EMOTION_ICONS[scene.emotion] || "📖";
   const kenBurnsClass = `ken-${scene.animationHint || "zoom-in"}`;
 
-  useEffect(() => {
-    // Auto-show text after a brief delay for the animation to settle
-    const timer = setTimeout(() => setShowText(true), 800);
-    return () => clearTimeout(timer);
-  }, [sceneIndex]);
+  const hasVideo = !!videoUrl;
 
-  async function speakNarrative() {
-    setSpeaking(true);
+  const startNarration = useCallback(async () => {
+    if (narrationStarted || narrationAbortRef.current) return;
+    setNarrationStarted(true);
+
     try {
       const res = await apiRequest("POST", "/api/tts", { text: narrative, voice: "nova" });
+      if (narrationAbortRef.current) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => setSpeaking(false);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setNarrationDone(true);
+        URL.revokeObjectURL(url);
+      };
       audio.onerror = () => {
-        setSpeaking(false);
         fallbackSpeak(narrative);
       };
-      audio.play();
+      audio.play().catch(() => {
+        fallbackSpeak(narrative);
+      });
     } catch {
       fallbackSpeak(narrative);
     }
-  }
+  }, [narrative, narrationStarted]);
 
   function fallbackSpeak(text: string) {
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.85;
     u.pitch = 1.05;
-    u.onend = () => setSpeaking(false);
+    u.onend = () => setNarrationDone(true);
     speechSynthesis.speak(u);
   }
 
+  useEffect(() => {
+    narrationAbortRef.current = false;
+    setNarrationDone(false);
+    setVideoDone(false);
+    setShowContent(false);
+    setShowButtons(false);
+    setNarrationStarted(false);
+    setVideoUrl(scene.videoUrl || null);
+    setVideoLoading(false);
+
+    const contentTimer = setTimeout(() => setShowContent(true), 1000);
+
+    const narrationTimer = setTimeout(() => {
+      startNarration();
+    }, 1500);
+
+    return () => {
+      narrationAbortRef.current = true;
+      clearTimeout(contentTimer);
+      clearTimeout(narrationTimer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      speechSynthesis.cancel();
+    };
+  }, [sceneIndex]);
+
+  useEffect(() => {
+    if (!scene.videoUrl && scene.videoStatus === "generating" && sermonId) {
+      setVideoLoading(true);
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/sermons/${sermonId}/scenes/${sceneIndex}/video-status`);
+          const data = await res.json();
+          if (data.videoStatus === "ready" && data.videoUrl) {
+            setVideoUrl(data.videoUrl);
+            setVideoLoading(false);
+            setVideoDone(false);
+            setShowButtons(false);
+            clearInterval(interval);
+          } else if (data.videoStatus === "failed") {
+            setVideoLoading(false);
+            clearInterval(interval);
+          }
+        } catch {
+          // keep polling
+        }
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [scene.videoUrl, scene.videoStatus, sermonId, sceneIndex]);
+
+  useEffect(() => {
+    if (hasVideo) {
+      if (narrationDone && videoDone) {
+        setShowButtons(true);
+      }
+    } else {
+      if (narrationDone) {
+        setShowButtons(true);
+      }
+    }
+  }, [narrationDone, videoDone, hasVideo]);
+
+  useEffect(() => {
+    if (!hasVideo && !videoLoading) {
+      const fallbackTimer = setTimeout(() => setVideoDone(true), 12000);
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [hasVideo, videoLoading, sceneIndex]);
+
+  function handleVideoEnded() {
+    setVideoDone(true);
+    if (videoRef.current) {
+      const duration = videoRef.current.duration;
+      if (duration && isFinite(duration)) {
+        videoRef.current.currentTime = duration - 0.01;
+      }
+    }
+  }
+
+  function toggleMute() {
+    setIsMuted((m) => {
+      const newMuted = !m;
+      if (audioRef.current) {
+        audioRef.current.muted = newMuted;
+      }
+      if (videoRef.current) {
+        videoRef.current.muted = newMuted;
+      }
+      return newMuted;
+    });
+  }
+
+  const isLast = sceneIndex + 1 >= totalScenes;
+
   return (
-    <div className="pb-8">
-      {/* Scene Illustration Area */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden">
-        {scene.imageUrl ? (
+    <div className="pb-24 relative">
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-se-navy">
+        {hasVideo ? (
+          <video
+            ref={videoRef}
+            src={videoUrl!}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted={isMuted}
+            playsInline
+            onEnded={handleVideoEnded}
+            onError={() => setVideoDone(true)}
+          />
+        ) : scene.imageUrl ? (
           <img
             src={scene.imageUrl}
             alt={scene.title}
             className={`w-full h-full object-cover ${kenBurnsClass}`}
-            onLoad={() => setImageLoaded(true)}
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center ${kenBurnsClass}`}>
             <div className="text-center">
               <span className="text-7xl block mb-2">{icon}</span>
-              <p className="text-white/30 font-display text-xs">Illustration generating...</p>
+              {videoLoading && (
+                <div className="flex items-center gap-2 mt-3">
+                  <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                  <p className="text-white/40 font-display text-xs">Creating animation...</p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Overlay gradient at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-se-navy to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-se-navy via-se-navy/60 to-transparent" />
 
-        {/* Scene number badge */}
         <div className="absolute top-4 left-4 bg-se-navy/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5">
           <BookOpen className="w-3 h-3 text-se-teal" />
           <span className="text-white/80 text-xs font-display font-bold">Scene {sceneIndex + 1}</span>
         </div>
+
+        <button
+          onClick={toggleMute}
+          className="absolute top-4 right-4 bg-se-navy/80 backdrop-blur-sm rounded-full p-2 hover:bg-se-navy/90 transition-colors"
+        >
+          {isMuted ? (
+            <VolumeX className="w-4 h-4 text-white/70" />
+          ) : (
+            <Volume2 className="w-4 h-4 text-white/70" />
+          )}
+        </button>
+
+        {videoLoading && scene.imageUrl && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-se-navy/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2">
+            <Loader2 className="w-3 h-3 text-se-amber animate-spin" />
+            <span className="text-white/60 text-xs font-display">Animation loading...</span>
+          </div>
+        )}
       </div>
 
-      {/* Scene Content */}
-      <div className="px-5 -mt-6 relative z-10">
-        {/* Title */}
+      <div className="px-5 -mt-10 relative z-10">
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,76 +270,75 @@ export default function SceneViewer({ scene, sceneIndex, ageGroup, userName, onC
           </motion.p>
         )}
 
-        {/* Narrative Text */}
-        {showText && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-5 mb-5"
-          >
-            <p className="text-white/90 font-story text-sm leading-relaxed">
-              {narrative}
-            </p>
-
-            {/* Key Point */}
-            <div className="mt-4 bg-se-teal/10 border border-se-teal/30 rounded-xl p-3">
-              <p className="text-se-teal font-display text-xs font-bold mb-1">KEY POINT</p>
-              <p className="text-white/80 font-display text-sm font-semibold">
-                {scene.keyPoint}
-              </p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={speakNarrative}
-            disabled={speaking}
-            className="w-full rounded-2xl p-4 bg-white/10 border border-white/20
-                       flex items-center justify-center gap-2
-                       hover:bg-white/15 transition-all disabled:opacity-50"
-          >
-            <Volume2 className={`w-5 h-5 text-se-amber ${speaking ? "animate-pulse" : ""}`} />
-            <span className="font-display font-bold text-white text-sm">
-              {speaking ? "Reading..." : "Read to Me"}
-            </span>
-          </motion.button>
-
-          <div className="flex gap-3">
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onSkip}
-              className="flex-1 rounded-2xl p-4 bg-white/5 border border-white/10
-                         flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+        <AnimatePresence>
+          {showContent && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-5 mb-5"
             >
-              <SkipForward className="w-4 h-4 text-white/50" />
-              <span className="font-display font-semibold text-white/50 text-sm">Skip</span>
-            </motion.button>
+              <p className="text-white/90 font-story text-sm leading-relaxed">
+                {narrative}
+              </p>
 
+              <div className="mt-4 bg-se-teal/10 border border-se-teal/30 rounded-xl p-3">
+                <p className="text-se-teal font-display text-xs font-bold mb-1">KEY POINT</p>
+                <p className="text-white/80 font-display text-sm font-semibold">
+                  {scene.keyPoint}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <AnimatePresence>
+        {showButtons && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent"
+          >
             <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
               whileTap={{ scale: 0.98 }}
               onClick={onComplete}
-              className="flex-[2] rounded-2xl p-4 bg-se-teal
-                         flex items-center justify-center gap-2 hover:bg-se-teal/90 transition-all"
+              className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
+                         hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
             >
-              <span className="font-display font-bold text-se-navy text-sm">Continue</span>
+              <span className="font-display font-bold text-se-navy text-sm">
+                {isLast ? "Finish Story" : "Next Scene"}
+              </span>
               <ChevronRight className="w-4 h-4 text-se-navy" />
             </motion.button>
+
+            <button
+              onClick={onSkip}
+              className="w-full mt-2 py-2 text-center"
+            >
+              <span className="font-display text-xs text-white/30 hover:text-white/50 transition-colors">
+                Skip to next
+              </span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!showButtons && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-4">
+          <div className="flex items-center justify-center gap-2 py-3">
+            <div className="flex gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
+            <span className="font-display text-xs text-white/30">
+              {!narrationDone ? "Listening..." : "Preparing..."}
+            </span>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

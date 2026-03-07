@@ -150,8 +150,10 @@ export default function Viewer() {
             <SceneViewer
               scene={scenes[currentScene]}
               sceneIndex={currentScene}
+              totalScenes={totalScenes}
               ageGroup={ageGroup}
               userName={userName}
+              sermonId={params.sermonId || ""}
               onComplete={handleSceneComplete}
               onSkip={handleSkipToNext}
             />

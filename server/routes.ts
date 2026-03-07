@@ -186,6 +186,208 @@ export async function registerRoutes(server: Server, app: Express) {
       res.status(500).json({ message: "Quiz generation failed", error: err.message });
     }
   });
+
+  // Generate video for a scene (on-demand via Sora API)
+  app.post("/api/generate-video", async (req, res) => {
+    try {
+      const { prompt, sceneIndex, sermonId } = req.body;
+      if (!prompt) return res.status(400).json({ message: "prompt is required" });
+
+      const videoResult = await generateVideo(prompt);
+
+      if (sermonId && sceneIndex !== undefined) {
+        const sermon = processedSermons.get(sermonId);
+        if (sermon?.scenes?.[sceneIndex]) {
+          sermon.scenes[sceneIndex].videoUrl = videoResult.url;
+          sermon.scenes[sceneIndex].videoStatus = "ready";
+        }
+      }
+
+      res.json({ videoUrl: videoResult.url, status: "ready" });
+    } catch (err: any) {
+      console.error("Video generation failed:", err);
+      res.status(500).json({ message: "Video generation failed", error: err.message });
+    }
+  });
+
+  // Start async video generation for a scene
+  app.post("/api/generate-video-async", async (req, res) => {
+    try {
+      const { prompt, sceneIndex, sermonId } = req.body;
+      if (!prompt) return res.status(400).json({ message: "prompt is required" });
+
+      const videoId = await startVideoGeneration(prompt);
+      const trackingKey = `${sermonId}-${sceneIndex}`;
+      videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
+
+      if (sermonId && sceneIndex !== undefined) {
+        const sermon = processedSermons.get(sermonId);
+        if (sermon?.scenes?.[sceneIndex]) {
+          sermon.scenes[sceneIndex].videoStatus = "generating";
+        }
+      }
+
+      pollVideoCompletion(trackingKey, videoId, sermonId, sceneIndex);
+
+      res.json({ videoId, trackingKey, status: "generating" });
+    } catch (err: any) {
+      console.error("Video generation start failed:", err);
+      res.status(500).json({ message: "Video generation failed", error: err.message });
+    }
+  });
+
+  // Check video generation status
+  app.get("/api/video-status/:trackingKey", (req, res) => {
+    const job = videoGenerationJobs.get(req.params.trackingKey);
+    if (!job) return res.status(404).json({ message: "No video job found" });
+    res.json({ status: job.status, videoUrl: job.url });
+  });
+
+  // Check video status by sermon/scene
+  app.get("/api/sermons/:id/scenes/:sceneIndex/video-status", (req, res) => {
+    const sermon = processedSermons.get(req.params.id);
+    if (!sermon) return res.status(404).json({ message: "Sermon not found" });
+    const scene = sermon.scenes?.[parseInt(req.params.sceneIndex)];
+    if (!scene) return res.status(404).json({ message: "Scene not found" });
+    res.json({
+      videoStatus: scene.videoStatus || "none",
+      videoUrl: scene.videoUrl || null,
+      imageUrl: scene.imageUrl || null,
+    });
+  });
+}
+
+// ============================================
+// VIDEO GENERATION (Sora API via REST)
+// ============================================
+
+const videoGenerationJobs: Map<string, { videoId: string; status: string; url: string | null }> = new Map();
+
+async function startVideoGeneration(prompt: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY is required for video generation");
+
+  const response = await fetch("https://api.openai.com/v1/video/generations", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "sora",
+      input: [{
+        type: "text",
+        text: prompt,
+      }],
+      size: "1280x720",
+      duration: 10,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Sora API error:", response.status, errorText);
+    throw new Error(`Sora API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json() as any;
+  return data.id;
+}
+
+async function checkVideoStatus(videoId: string): Promise<{ status: string; url: string | null }> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY is required");
+
+  const response = await fetch(`https://api.openai.com/v1/video/generations/${videoId}`, {
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Sora status check error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json() as any;
+
+  if (data.status === "completed") {
+    const videoUrl = data.output?.url || data.output?.[0]?.url || null;
+    return { status: "ready", url: videoUrl };
+  } else if (data.status === "failed") {
+    return { status: "failed", url: null };
+  }
+
+  return { status: "generating", url: null };
+}
+
+async function generateVideo(prompt: string): Promise<{ url: string }> {
+  const videoId = await startVideoGeneration(prompt);
+
+  let attempts = 0;
+  const maxAttempts = 60;
+  while (attempts < maxAttempts) {
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    attempts++;
+
+    const result = await checkVideoStatus(videoId);
+    if (result.status === "ready" && result.url) {
+      return { url: result.url };
+    }
+    if (result.status === "failed") {
+      throw new Error("Video generation failed on Sora side");
+    }
+  }
+
+  throw new Error("Video generation timed out after 10 minutes");
+}
+
+function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: string, sceneIndex: number) {
+  const poll = async () => {
+    let attempts = 0;
+    const maxAttempts = 60;
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      attempts++;
+
+      try {
+        const result = await checkVideoStatus(videoId);
+        const job = videoGenerationJobs.get(trackingKey);
+
+        if (result.status === "ready" && result.url) {
+          if (job) {
+            job.status = "ready";
+            job.url = result.url;
+          }
+          const sermon = processedSermons.get(sermonId);
+          if (sermon?.scenes?.[sceneIndex]) {
+            sermon.scenes[sceneIndex].videoUrl = result.url;
+            sermon.scenes[sceneIndex].videoStatus = "ready";
+          }
+          console.log(`Video ready for ${trackingKey}`);
+          return;
+        }
+
+        if (result.status === "failed") {
+          if (job) job.status = "failed";
+          const sermon = processedSermons.get(sermonId);
+          if (sermon?.scenes?.[sceneIndex]) {
+            sermon.scenes[sceneIndex].videoStatus = "failed";
+          }
+          console.error(`Video generation failed for ${trackingKey}`);
+          return;
+        }
+      } catch (err) {
+        console.error(`Error polling video ${trackingKey}:`, err);
+      }
+    }
+
+    const job = videoGenerationJobs.get(trackingKey);
+    if (job) job.status = "failed";
+    console.error(`Video generation timed out for ${trackingKey}`);
+  };
+
+  poll().catch(console.error);
 }
 
 // ============================================
@@ -221,17 +423,33 @@ async function processSermon(sermonId: string, text: string) {
     scenes[i].narratives = narratives;
   }
 
-  // Step 4: Generate images for each scene
+  // Step 4: Generate images first (fast), then start video generation in background
   updateProgress("Generating illustrations...", 50);
   fs.mkdirSync("generated", { recursive: true });
   for (let i = 0; i < scenes.length; i++) {
-    updateProgress(`Illustrating scene ${i + 1}/${scenes.length}...`, 50 + (i / scenes.length) * 25);
+    updateProgress(`Illustrating scene ${i + 1}/${scenes.length}...`, 50 + (i / scenes.length) * 15);
     try {
       const imageUrl = await generateImage(scenes[i].imagePrompt);
       scenes[i].imageUrl = imageUrl;
     } catch (err) {
       console.error(`Image gen failed for scene ${i}:`, err);
       scenes[i].imageUrl = null;
+    }
+  }
+
+  // Step 4b: Start video generation for each scene (runs in background)
+  updateProgress("Starting video animations...", 65);
+  for (let i = 0; i < scenes.length; i++) {
+    const videoPrompt = scenes[i].videoPrompt || scenes[i].imagePrompt;
+    try {
+      scenes[i].videoStatus = "generating";
+      const videoId = await startVideoGeneration(videoPrompt);
+      const trackingKey = `${sermonId}-${i}`;
+      videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
+      pollVideoCompletion(trackingKey, videoId, sermonId, i);
+    } catch (err) {
+      console.error(`Video gen start failed for scene ${i}:`, err);
+      scenes[i].videoStatus = "failed";
     }
   }
 
@@ -290,6 +508,7 @@ For each scene, provide:
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
 - imagePrompt: A detailed DALL-E prompt for a warm, child-friendly watercolor-style illustration. The style should be: soft watercolor with warm lighting, diverse characters, biblical setting with gentle colors, suitable for children ages 4-12. Never include text in images. Be specific about the scene composition.
+- videoPrompt: A detailed prompt for a 10-second animated video of this scene. Describe gentle motion and action: characters moving, wind blowing, light shifting, camera panning slowly. Use warm, soft watercolor animation style with biblical setting. The video should feel like a gentle animated storybook illustration coming to life. Keep motion subtle and calming, suitable for children. Never include text or words in the video.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade" - suggests the Ken Burns motion
 
 Respond with JSON: { "scenes": [...] }`,
