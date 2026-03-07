@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { BookOpen, Upload, ChevronRight } from "lucide-react";
-import cdmLogo from "@assets/Screenshot_2026-03-07_at_4.46.59_PM_1772923623508.png";
+const cdmLogo = "/cdm-logo.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
