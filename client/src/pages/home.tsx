@@ -46,10 +46,10 @@ export default function Home() {
         >
           <img src={cdmLogo} alt="CDM Discipleship Ministries" className="h-[115px] mx-auto mb-4" />
           <h1 className="font-display text-5xl font-extrabold text-white mb-3">
-            Sermon Explorer
+            <span className="font-accent text-6xl text-se-blue">Sermon</span>{" "}Explorer
           </h1>
-          <p className="text-se-teal font-display text-lg font-semibold">
-            Sunday's Sermon, Brought to Life
+          <p className="text-se-blue font-display text-lg font-semibold">
+            Sunday's Sermon, <span className="font-accent text-xl">Brought to Life</span>
           </p>
           <p className="text-white/50 mt-2 text-sm max-w-md mx-auto">
             Interactive illustrated storybooks that transform weekly sermons into
@@ -75,20 +75,20 @@ export default function Home() {
               onClick={() => setLocation(`/view/${sermon.id}`)}
               className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5
                          flex items-center gap-4 text-left
-                         hover:bg-white/15 hover:border-se-teal/50 transition-all group"
+                         hover:bg-white/15 hover:border-se-blue/50 transition-all group"
             >
-              <div className="w-14 h-14 rounded-xl bg-se-teal/20 flex items-center justify-center
-                              group-hover:bg-se-teal/30 transition-colors flex-shrink-0">
-                <BookOpen className="w-7 h-7 text-se-teal" />
+              <div className="w-14 h-14 rounded-xl bg-se-blue/20 flex items-center justify-center
+                              group-hover:bg-se-blue/30 transition-colors flex-shrink-0">
+                <BookOpen className="w-7 h-7 text-se-blue" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display text-lg font-bold text-white truncate">
                   {sermon.title}
                 </h3>
                 <p className="text-white/50 text-sm">{sermon.scripture}</p>
-                <p className="text-se-teal text-xs mt-1">{sermon.sceneCount} scenes</p>
+                <p className="text-se-blue text-xs mt-1">{sermon.sceneCount} scenes</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-se-teal transition-colors" />
+              <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-se-blue transition-colors" />
             </motion.button>
           ))}
 
@@ -98,12 +98,12 @@ export default function Home() {
               className="w-full bg-white/5 border border-white/10 rounded-2xl p-5
                          flex items-center gap-4"
             >
-              <div className="w-14 h-14 rounded-xl bg-se-amber/20 flex items-center justify-center flex-shrink-0">
-                <div className="w-6 h-6 border-2 border-se-amber border-t-transparent rounded-full animate-spin" />
+              <div className="w-14 h-14 rounded-xl bg-se-green/20 flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 border-2 border-se-green border-t-transparent rounded-full animate-spin" />
               </div>
               <div>
                 <h3 className="font-display font-bold text-white/70">{sermon.title}</h3>
-                <p className="text-se-amber text-xs">Processing...</p>
+                <p className="text-se-green text-xs">Processing...</p>
               </div>
             </div>
           ))}
@@ -140,15 +140,15 @@ export default function Home() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setLocation("/upload")}
-            className="w-full bg-se-teal/15 border border-se-teal/30 rounded-xl p-4
+            className="w-full bg-se-blue/15 border border-se-blue/30 rounded-xl p-4
                        flex items-center gap-3
-                       hover:bg-se-teal/25 hover:border-se-teal/50 transition-all"
+                       hover:bg-se-blue/25 hover:border-se-blue/50 transition-all"
           >
-            <div className="w-10 h-10 rounded-lg bg-se-teal/20 flex items-center justify-center flex-shrink-0">
-              <Upload className="w-5 h-5 text-se-teal" />
+            <div className="w-10 h-10 rounded-lg bg-se-blue/20 flex items-center justify-center flex-shrink-0">
+              <Upload className="w-5 h-5 text-se-blue" />
             </div>
             <div className="text-left">
-              <span className="font-display font-bold text-se-teal text-sm block">Upload New Sermon</span>
+              <span className="font-display font-bold text-se-blue text-sm block">Upload New Sermon</span>
               <span className="text-white/40 text-xs">Process a transcript into an interactive storybook</span>
             </div>
           </motion.button>

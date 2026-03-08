@@ -84,7 +84,7 @@ export default function UploadPage() {
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-white/30 rounded-3xl p-12
                          flex flex-col items-center justify-center cursor-pointer
-                         hover:border-se-teal/60 hover:bg-white/5 transition-all"
+                         hover:border-se-blue/60 hover:bg-white/5 transition-all"
             >
               <input
                 ref={fileInputRef}
@@ -95,7 +95,7 @@ export default function UploadPage() {
               />
               {file ? (
                 <>
-                  <FileText className="w-12 h-12 text-se-teal mb-3" />
+                  <FileText className="w-12 h-12 text-se-blue mb-3" />
                   <p className="font-display font-bold text-white text-lg">{file.name}</p>
                   <p className="text-white/50 text-sm mt-1">{(file.size / 1024).toFixed(0)} KB</p>
                 </>
@@ -112,7 +112,7 @@ export default function UploadPage() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="mt-6 bg-white/5 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Film className="w-4 h-4 text-se-teal" />
+                    <Film className="w-4 h-4 text-se-blue" />
                     <h3 className="font-display font-bold text-white text-sm">Video Quality</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -120,7 +120,7 @@ export default function UploadPage() {
                       onClick={() => setVideoModel("sora-2")}
                       className={`rounded-xl p-3 text-left transition-all border ${
                         videoModel === "sora-2"
-                          ? "bg-se-teal/20 border-se-teal/60 text-white"
+                          ? "bg-se-blue/20 border-se-blue/60 text-white"
                           : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                       }`}
                     >
@@ -131,7 +131,7 @@ export default function UploadPage() {
                       onClick={() => setVideoModel("sora-2-pro")}
                       className={`rounded-xl p-3 text-left transition-all border ${
                         videoModel === "sora-2-pro"
-                          ? "bg-se-amber/20 border-se-amber/60 text-white"
+                          ? "bg-se-green/20 border-se-green/60 text-white"
                           : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                       }`}
                     >
@@ -144,7 +144,7 @@ export default function UploadPage() {
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={handleUpload}
-                  className="w-full mt-4 child-button bg-se-teal text-se-navy"
+                  className="w-full mt-4 child-button bg-se-blue text-se-navy"
                 >
                   Process Sermon
                 </motion.button>
@@ -155,19 +155,19 @@ export default function UploadPage() {
               <h3 className="font-display font-bold text-white text-sm mb-3">What happens next?</h3>
               <div className="space-y-3 text-sm text-white/60">
                 <div className="flex gap-3">
-                  <span className="text-se-teal font-bold">1.</span>
+                  <span className="text-se-blue font-bold">1.</span>
                   <p>AI reads and analyzes the sermon transcript</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-se-teal font-bold">2.</span>
+                  <span className="text-se-blue font-bold">2.</span>
                   <p>Breaks it into illustrated scenes with age-appropriate narratives</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-se-teal font-bold">3.</span>
+                  <span className="text-se-blue font-bold">3.</span>
                   <p>Generates original artwork, quizzes, and discussion prompts</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-se-teal font-bold">4.</span>
+                  <span className="text-se-blue font-bold">4.</span>
                   <p>Assembles the complete interactive storybook experience</p>
                 </div>
               </div>
@@ -181,7 +181,7 @@ export default function UploadPage() {
               <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
                 <circle
-                  cx="50" cy="50" r="45" fill="none" stroke="#2AADAD" strokeWidth="8"
+                  cx="50" cy="50" r="45" fill="none" stroke="#1d88a9" strokeWidth="8"
                   strokeLinecap="round"
                   strokeDasharray={`${progress * 2.83} 283`}
                   className="transition-all duration-500"
@@ -194,7 +194,7 @@ export default function UploadPage() {
             <h2 className="font-display text-xl font-bold text-white mb-2">
               {status === "uploading" ? "Uploading..." : "Creating Your Storybook"}
             </h2>
-            <p className="text-se-teal text-sm font-display">{currentStep || "Starting..."}</p>
+            <p className="text-se-blue text-sm font-display">{currentStep || "Starting..."}</p>
             <p className="text-white/30 text-xs mt-4 max-w-xs mx-auto">
               {progress > 70
                 ? "Generating animated video scenes. This step takes several minutes — please keep this page open."
@@ -205,13 +205,13 @@ export default function UploadPage() {
 
         {status === "done" && (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center pt-12">
-            <CheckCircle className="w-16 h-16 text-se-teal mx-auto mb-4" />
+            <CheckCircle className="w-16 h-16 text-se-blue mx-auto mb-4" />
             <h2 className="font-display text-2xl font-bold text-white mb-2">Ready!</h2>
             <p className="text-white/60 text-sm mb-6">Your sermon storybook is ready to explore.</p>
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={() => setLocation(`/view/${sermonId}`)}
-              className="child-button bg-se-teal text-se-navy"
+              className="child-button bg-se-blue text-se-navy"
             >
               Open Storybook
             </motion.button>
@@ -220,7 +220,7 @@ export default function UploadPage() {
 
         {status === "error" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center pt-12">
-            <AlertCircle className="w-16 h-16 text-se-coral mx-auto mb-4" />
+            <AlertCircle className="w-16 h-16 text-se-purple mx-auto mb-4" />
             <h2 className="font-display text-xl font-bold text-white mb-2">Something went wrong</h2>
             <p className="text-white/60 text-sm mb-6">{error}</p>
             <button onClick={() => { setStatus("idle"); setFile(null); }} className="child-button bg-white/10 text-white">

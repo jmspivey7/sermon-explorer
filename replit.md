@@ -4,7 +4,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 
 ## Architecture
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion + CDM Brand
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
 - **AI**: OpenAI (GPT-4o for content, DALL-E 3 for images, Sora 2 for animated MP4 videos, TTS for narration)
@@ -86,10 +86,18 @@ script/
 7. Upload page holds user with progress bar until everything is ready (72-95% = video download phase)
 8. User only enters the viewer after all videos are downloaded — no "Generating animation..." overlays
 
+## Brand / Design
+
+- **CDM Brand Colors**: Blue #1d88a9, Green #80ad40, Purple #785992, Brown #7c6752, Gray-Blue #54636c
+- **Tailwind color prefix**: `se-` (e.g., `se-blue`, `se-green`, `se-purple`, `se-brown`, `se-grayblue`, `se-navy`, `se-cream`)
+- **Fonts**: Source Sans 3 (structural — sans, display, story), Devonshire (accent/decorative — `font-accent`)
+- **Google Fonts loaded in**: `client/index.html`
+- **CDM logo**: `client/public/cdm-logo.webp`
+
 ## Notes
 
 - `nanoid` is a transitive dependency (used in server/vite.ts for cache busting)
-- OpenAI client is lazily instantiated to allow server startup without API key
+- OpenAI client reads API key fresh from env on every call (no caching)
 - `__dirname` polyfill added to vite.config.ts and server/vite.ts for ESM compatibility
 - Sora 2 API: `POST https://api.openai.com/v1/videos` with model `sora-2` or `sora-2-pro`
 - Video status check: `GET https://api.openai.com/v1/videos/{id}` — returns status/progress (no download_url field)

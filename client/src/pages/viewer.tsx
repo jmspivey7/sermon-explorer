@@ -34,7 +34,7 @@ export default function Viewer() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-se-navy flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-se-teal border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-se-blue border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function Viewer() {
     return (
       <div className="min-h-screen bg-se-navy flex flex-col items-center justify-center text-white">
         <p className="text-white/60">Sermon not found</p>
-        <button onClick={() => setLocation("/")} className="mt-4 text-se-teal underline">Go back</button>
+        <button onClick={() => setLocation("/")} className="mt-4 text-se-blue underline">Go back</button>
       </div>
     );
   }
@@ -112,7 +112,7 @@ export default function Viewer() {
                 <div
                   key={i}
                   className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                    i < currentScene ? "bg-se-teal" : i === currentScene ? "bg-se-amber" : "bg-white/15"
+                    i < currentScene ? "bg-se-blue" : i === currentScene ? "bg-se-green" : "bg-white/15"
                   }`}
                 />
               ))}

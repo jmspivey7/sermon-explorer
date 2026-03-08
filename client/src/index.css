@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Nunito', sans-serif;
-  --font-story: 'Merriweather', Georgia, serif;
+  --font-sans: 'Source Sans 3', sans-serif;
+  --font-display: 'Source Sans 3', sans-serif;
+  --font-story: 'Source Sans 3', Georgia, serif;
+  --font-accent: 'Devonshire', cursive;
 }
 
 @layer base {
@@ -58,8 +59,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(42, 173, 173, 0.4); }
-  50% { box-shadow: 0 0 20px 10px rgba(42, 173, 173, 0.1); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29, 136, 169, 0.4); }
+  50% { box-shadow: 0 0 20px 10px rgba(29, 136, 169, 0.1); }
 }
 .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 

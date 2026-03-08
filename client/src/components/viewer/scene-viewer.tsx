@@ -16,14 +16,14 @@ interface Props {
 }
 
 const EMOTION_GRADIENTS: Record<string, string> = {
-  curiosity: "from-amber-800 via-teal-900 to-blue-900",
-  surprise: "from-yellow-800 via-orange-900 to-red-900",
-  conviction: "from-slate-800 via-indigo-900 to-purple-900",
-  sadness: "from-blue-900 via-slate-800 to-gray-900",
-  compassion: "from-teal-800 via-cyan-900 to-blue-900",
-  urgency: "from-amber-900 via-red-900 to-rose-900",
-  hope: "from-amber-700 via-yellow-800 to-orange-900",
-  transformation: "from-green-800 via-teal-800 to-cyan-900",
+  curiosity: "from-[#1d88a9] via-[#54636c] to-[#0f1d2e]",
+  surprise: "from-[#80ad40] via-[#7c6752] to-[#0f1d2e]",
+  conviction: "from-slate-800 via-[#785992] to-[#0f1d2e]",
+  sadness: "from-[#54636c] via-slate-800 to-[#0f1d2e]",
+  compassion: "from-[#1d88a9] via-[#785992] to-[#0f1d2e]",
+  urgency: "from-[#7c6752] via-[#785992] to-[#0f1d2e]",
+  hope: "from-[#80ad40] via-[#1d88a9] to-[#0f1d2e]",
+  transformation: "from-[#80ad40] via-[#1d88a9] to-[#785992]",
 };
 
 const EMOTION_ICONS: Record<string, string> = {
@@ -209,7 +209,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-se-navy via-se-navy/60 to-transparent" />
 
         <div className="absolute top-4 left-4 bg-se-navy/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5">
-          <BookOpen className="w-3 h-3 text-se-teal" />
+          <BookOpen className="w-3 h-3 text-se-blue" />
           <span className="text-white/80 text-xs font-display font-bold">Scene {sceneIndex + 1}</span>
         </div>
 
@@ -242,7 +242,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-se-teal font-display text-sm font-semibold mb-4"
+            className="text-se-blue font-display text-sm font-semibold mb-4"
           >
             {scene.scriptureRef}
           </motion.p>
@@ -260,8 +260,8 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
                 {narrative}
               </p>
 
-              <div className="mt-4 bg-se-teal/10 border border-se-teal/30 rounded-xl p-3">
-                <p className="text-se-teal font-display text-xs font-bold mb-1">KEY POINT</p>
+              <div className="mt-4 bg-se-blue/10 border border-se-blue/30 rounded-xl p-3">
+                <p className="text-se-blue font-display text-xs font-bold mb-1">KEY POINT</p>
                 <p className="text-white/80 font-display text-sm font-semibold">
                   {scene.keyPoint}
                 </p>
@@ -282,8 +282,8 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={onComplete}
-              className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                         hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+              className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                         hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
             >
               <span className="font-display font-bold text-se-navy text-sm">
                 {isLast ? "Finish Story" : "Next Scene"}
@@ -307,9 +307,9 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
         <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-4">
           <div className="flex items-center justify-center gap-2 py-3">
             <div className="flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-se-teal animate-bounce" style={{ animationDelay: "300ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
             <span className="font-display text-xs text-white/30">
               {!narrationDone ? "Listening..." : "Preparing..."}

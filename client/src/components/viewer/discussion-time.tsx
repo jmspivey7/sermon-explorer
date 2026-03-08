@@ -26,8 +26,8 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={onComplete}
-            className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
             <span className="font-display font-bold text-se-navy text-sm">Continue</span>
             <ChevronRight className="w-4 h-4 text-se-navy" />
@@ -40,11 +40,11 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
   return (
     <div className="px-5 py-6 pb-28">
       <div className="text-center mb-6">
-        <div className="w-16 h-16 rounded-full bg-se-coral/20 flex items-center justify-center mx-auto mb-3">
-          <Users className="w-8 h-8 text-se-coral" />
+        <div className="w-16 h-16 rounded-full bg-se-purple/20 flex items-center justify-center mx-auto mb-3">
+          <Users className="w-8 h-8 text-se-purple" />
         </div>
         <h2 className="font-display text-xl font-extrabold text-white mb-1">
-          Family Discussion
+          <span className="font-accent text-2xl text-se-purple">Family</span> Discussion
         </h2>
         <p className="text-white/50 font-display text-sm">
           Talk about what you learned together
@@ -52,7 +52,7 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
-        <p className="text-se-teal font-display text-xs font-bold mb-1">FROM THIS SCENE</p>
+        <p className="text-se-blue font-display text-xs font-bold mb-1">FROM THIS SCENE</p>
         <p className="text-white font-display font-semibold text-sm">{scene.title}</p>
         {scene.keyPoint && (
           <p className="text-white/60 font-story text-sm mt-1">{scene.keyPoint}</p>
@@ -69,11 +69,11 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
             className="bg-white/8 border border-white/15 rounded-2xl p-5"
           >
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-se-amber/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <MessageCircle className="w-4 h-4 text-se-amber" />
+              <div className="w-8 h-8 rounded-full bg-se-green/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <MessageCircle className="w-4 h-4 text-se-green" />
               </div>
               <div>
-                <p className="text-se-amber font-display text-xs font-bold mb-1">
+                <p className="text-se-green font-display text-xs font-bold mb-1">
                   QUESTION {idx + 1}
                 </p>
                 <p className="text-white/90 font-story text-sm leading-relaxed">
@@ -95,14 +95,14 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
                      flex items-center justify-center gap-2 mb-4
                      hover:bg-white/10 transition-all"
         >
-          <Heart className="w-4 h-4 text-se-coral" />
+          <Heart className="w-4 h-4 text-se-purple" />
           <span className="font-display font-semibold text-white/70 text-sm">
             Show Another Question
           </span>
         </motion.button>
       )}
 
-      <div className="bg-se-teal/10 border border-se-teal/20 rounded-2xl p-4 mb-6">
+      <div className="bg-se-blue/10 border border-se-blue/20 rounded-2xl p-4 mb-6">
         <p className="text-white/70 font-story text-sm leading-relaxed text-center">
           Take your time with these questions. There are no wrong answers — the goal
           is to listen, share, and grow together.
@@ -113,8 +113,8 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={onComplete}
-          className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                     hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+          className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                     hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
         >
           <span className="font-display font-bold text-se-navy text-sm">
             {isLastScene ? "See Your Results" : "Next Scene"}

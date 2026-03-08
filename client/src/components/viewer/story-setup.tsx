@@ -10,9 +10,9 @@ interface Props {
 }
 
 const AGE_OPTIONS: { id: AgeGroup; label: string; range: string; emoji: string; color: string }[] = [
-  { id: "young", label: "Little Explorer", range: "Ages 4-6", emoji: "🧸", color: "bg-se-amber" },
-  { id: "older", label: "Big Explorer", range: "Ages 7-10", emoji: "🌟", color: "bg-se-teal" },
-  { id: "family", label: "Family Mode", range: "Ages 11+", emoji: "👨‍👩‍👧‍👦", color: "bg-se-sky" },
+  { id: "young", label: "Little Explorer", range: "Ages 4-6", emoji: "🧸", color: "bg-se-green" },
+  { id: "older", label: "Big Explorer", range: "Ages 7-10", emoji: "🌟", color: "bg-se-blue" },
+  { id: "family", label: "Family Mode", range: "Ages 11+", emoji: "👨‍👩‍👧‍👦", color: "bg-se-grayblue" },
 ];
 
 export default function StorySetup({ sermon, onComplete, onBack }: Props) {
@@ -30,11 +30,12 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center max-w-md"
       >
-        <Sparkles className="w-8 h-8 text-se-amber mx-auto mb-3" />
+        <Sparkles className="w-8 h-8 text-se-green mx-auto mb-3" />
         <h1 className="font-display text-3xl font-extrabold text-white mb-2">
           {sermon.title}
         </h1>
-        <p className="text-se-teal font-display font-semibold">{sermon.scripture}</p>
+        <p className="font-accent text-2xl text-se-green/80">a storybook journey</p>
+        <p className="text-se-blue font-display font-semibold">{sermon.scripture}</p>
         <p className="text-white/50 text-sm mt-3 leading-relaxed">{sermon.summary}</p>
 
         {/* Name Input */}
@@ -48,7 +49,7 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
             className="w-full text-center text-lg font-display font-bold
                        bg-white/10 border-2 border-white/20 rounded-2xl px-4 py-3
                        text-white placeholder:text-white/30
-                       focus:outline-none focus:border-se-teal transition-all"
+                       focus:outline-none focus:border-se-blue transition-all"
           />
         </div>
 
@@ -88,7 +89,7 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
             if (selectedAge) onComplete(selectedAge, name || "Explorer");
           }}
           disabled={!selectedAge}
-          className="mt-8 w-full child-button bg-se-teal text-se-navy disabled:opacity-30 disabled:cursor-not-allowed"
+          className="mt-8 w-full child-button bg-se-blue text-se-navy disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <BookOpen className="w-5 h-5 inline mr-2" />
           Begin the Story

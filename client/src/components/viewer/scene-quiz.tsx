@@ -30,8 +30,8 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
         <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
           <button
             onClick={onSkip}
-            className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
             <span className="font-display font-bold text-se-navy text-sm">Continue</span>
             <ChevronRight className="w-4 h-4 text-se-navy" />
@@ -74,8 +74,8 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
     <div className="px-5 py-6 pb-28">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-se-amber" />
-          <span className="font-display font-bold text-white text-sm">Quiz Time!</span>
+          <Sparkles className="w-5 h-5 text-se-green" />
+          <span className="font-display font-bold text-white text-sm"><span className="font-accent text-lg text-se-green">Quiz</span> Time!</span>
         </div>
         <span className="text-white/40 font-display text-xs">
           {currentQ + 1} / {total}
@@ -87,7 +87,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-all ${
-              i < currentQ ? "bg-se-teal" : i === currentQ ? "bg-se-amber" : "bg-white/15"
+              i < currentQ ? "bg-se-blue" : i === currentQ ? "bg-se-green" : "bg-white/15"
             }`}
           />
         ))}
@@ -117,7 +117,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
               textColor = "text-red-300";
               letterBg = "bg-red-500/30";
             } else if (selected === idx && !showResult) {
-              bg = "bg-se-teal/20 border-se-teal/50";
+              bg = "bg-se-blue/20 border-se-blue/50";
             }
 
             return (
@@ -184,8 +184,8 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             animate={{ opacity: 1, y: 0 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleNext}
-            className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                       hover:bg-se-teal/90 transition-all shadow-lg shadow-se-teal/20"
+            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
             <span className="font-display font-bold text-se-navy text-sm">
               {isLast ? "See Discussion" : "Next Question"}

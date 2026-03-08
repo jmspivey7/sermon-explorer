@@ -12,9 +12,9 @@ interface Props {
 
 function getGrade(pct: number) {
   if (pct >= 90) return { label: "Bible Scholar!", emoji: "🏆", color: "text-yellow-400" };
-  if (pct >= 70) return { label: "Great Explorer!", emoji: "⭐", color: "text-se-amber" };
-  if (pct >= 50) return { label: "Good Listener!", emoji: "👏", color: "text-se-teal" };
-  return { label: "Keep Learning!", emoji: "📖", color: "text-se-coral" };
+  if (pct >= 70) return { label: "Great Explorer!", emoji: "⭐", color: "text-se-green" };
+  if (pct >= 50) return { label: "Good Listener!", emoji: "👏", color: "text-se-blue" };
+  return { label: "Keep Learning!", emoji: "📖", color: "text-se-purple" };
 }
 
 export default function FinalSummary({ sermon, score, totalQuestions, userName, onRestart, onHome }: Props) {
@@ -51,7 +51,7 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
           {/* Score */}
           <div className="text-center">
             <div className="flex items-center gap-1 justify-center mb-1">
-              <Trophy className="w-5 h-5 text-se-amber" />
+              <Trophy className="w-5 h-5 text-se-green" />
               <span className={`font-display text-3xl font-extrabold ${grade.color}`}>
                 {pct}%
               </span>
@@ -65,8 +65,8 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
           {/* Scenes Completed */}
           <div className="text-center">
             <div className="flex items-center gap-1 justify-center mb-1">
-              <BookOpen className="w-5 h-5 text-se-teal" />
-              <span className="font-display text-3xl font-extrabold text-se-teal">
+              <BookOpen className="w-5 h-5 text-se-blue" />
+              <span className="font-display text-3xl font-extrabold text-se-blue">
                 {scenes.length}
               </span>
             </div>
@@ -97,8 +97,8 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
         className="mb-6"
       >
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-se-amber" />
-          <h3 className="font-display font-bold text-white text-sm">Key Takeaways</h3>
+          <Sparkles className="w-4 h-4 text-se-green" />
+          <h3 className="font-display font-bold text-white text-sm"><span className="font-accent text-lg text-se-green">Key</span> Takeaways</h3>
         </div>
         <div className="space-y-2">
           {scenes.map((scene: any, idx: number) => (
@@ -106,8 +106,8 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
               key={idx}
               className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-start gap-3"
             >
-              <div className="w-6 h-6 rounded-full bg-se-teal/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-se-teal font-display text-xs font-bold">{idx + 1}</span>
+              <div className="w-6 h-6 rounded-full bg-se-blue/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-se-blue font-display text-xs font-bold">{idx + 1}</span>
               </div>
               <div>
                 <p className="text-white font-display text-sm font-semibold">{scene.title}</p>
@@ -123,9 +123,9 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="bg-se-teal/10 border border-se-teal/20 rounded-2xl p-4 mb-8 text-center"
+        className="bg-se-blue/10 border border-se-blue/20 rounded-2xl p-4 mb-8 text-center"
       >
-        <p className="text-se-teal font-display text-xs font-bold mb-1">BASED ON</p>
+        <p className="text-se-blue font-display text-xs font-bold mb-1">BASED ON</p>
         <p className="text-white font-display font-bold text-sm">{sermon.title}</p>
         {sermon.church && (
           <p className="text-white/50 font-display text-xs mt-0.5">{sermon.church}</p>
@@ -141,8 +141,8 @@ export default function FinalSummary({ sermon, score, totalQuestions, userName, 
       >
         <button
           onClick={onRestart}
-          className="w-full rounded-2xl p-4 bg-se-teal flex items-center justify-center gap-2
-                     hover:bg-se-teal/90 transition-all"
+          className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                     hover:bg-se-blue/90 transition-all"
         >
           <RotateCcw className="w-5 h-5 text-se-navy" />
           <span className="font-display font-bold text-se-navy text-sm">Explore Again</span>
