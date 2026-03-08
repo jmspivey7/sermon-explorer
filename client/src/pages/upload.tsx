@@ -192,10 +192,14 @@ export default function UploadPage() {
               </div>
             </div>
             <h2 className="font-display text-xl font-bold text-white mb-2">
-              {status === "uploading" ? "Uploading..." : "Processing Sermon"}
+              {status === "uploading" ? "Uploading..." : "Creating Your Storybook"}
             </h2>
             <p className="text-se-teal text-sm font-display">{currentStep || "Starting..."}</p>
-            <p className="text-white/30 text-xs mt-4">This may take several minutes</p>
+            <p className="text-white/30 text-xs mt-4 max-w-xs mx-auto">
+              {progress > 70
+                ? "Generating animated video scenes. This step takes several minutes — please keep this page open."
+                : "This may take several minutes"}
+            </p>
           </motion.div>
         )}
 

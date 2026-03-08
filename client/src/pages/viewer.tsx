@@ -29,13 +29,6 @@ export default function Viewer() {
       const res = await fetch(`/api/sermons/${params.sermonId}`);
       return res.json();
     },
-    refetchInterval: (query) => {
-      const data = query.state.data;
-      if (data?.scenes?.some((s: any) => s.videoStatus === "generating")) {
-        return 5000;
-      }
-      return false;
-    },
   });
 
   if (isLoading) {

@@ -128,11 +128,14 @@ export async function registerRoutes(server: Server, app: Express) {
   app.get("/api/sermons/:id/status", (req, res) => {
     const sermon = processedSermons.get(req.params.id);
     if (!sermon) return res.status(404).json({ message: "Sermon not found" });
+    const readyVideos = sermon.scenes?.filter((s: any) => s.videoStatus === "ready").length || 0;
+    const totalScenes = sermon.scenes?.length || 0;
     res.json({
       status: sermon.status,
       progress: sermon.progress || 0,
       currentStep: sermon.currentStep || "",
-      sceneCount: sermon.scenes?.length || 0,
+      sceneCount: totalScenes,
+      videosReady: readyVideos,
     });
   });
 
@@ -473,24 +476,25 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     }
   }
 
-  // Step 4b: Start video generation for each scene (runs in background)
+  // Step 4b: Start ALL video generation jobs in parallel
   updateProgress("Starting video animations...", 65);
+  const videoJobs: Array<{ index: number; videoId: string }> = [];
   for (let i = 0; i < scenes.length; i++) {
     const videoPrompt = scenes[i].videoPrompt || scenes[i].imagePrompt;
     try {
       scenes[i].videoStatus = "generating";
       const videoId = await startVideoGeneration(videoPrompt, videoModel);
+      videoJobs.push({ index: i, videoId });
       const trackingKey = `${sermonId}-${i}`;
       videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
-      pollVideoCompletion(trackingKey, videoId, sermonId, i);
     } catch (err) {
       console.error(`Video gen start failed for scene ${i}:`, err);
       scenes[i].videoStatus = "failed";
     }
   }
 
-  // Step 5: Generate quizzes and discussion prompts
-  updateProgress("Creating quizzes and discussion prompts...", 80);
+  // Step 5: Generate quizzes and discussion prompts (while videos generate in parallel)
+  updateProgress("Creating quizzes and discussion prompts...", 68);
   for (let i = 0; i < scenes.length; i++) {
     const quiz = await generateQuiz(scenes[i].content, "mixed");
     scenes[i].quiz = quiz;
@@ -498,8 +502,58 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     scenes[i].discussionPrompts = discussion;
   }
 
-  // Step 6: Final assembly
-  updateProgress("Assembling experience...", 95);
+  // Step 6: Wait for ALL videos to finish generating and download them
+  updateProgress("Generating animated videos... This takes a few minutes.", 72);
+  if (videoJobs.length > 0) {
+    const totalVideos = videoJobs.length;
+    let completedVideos = 0;
+
+    await Promise.all(videoJobs.map(async ({ index, videoId }) => {
+      try {
+        let attempts = 0;
+        const maxAttempts = 120;
+        while (attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 10000));
+          attempts++;
+
+          const result = await checkVideoStatus(videoId);
+          const progressPct = result.progress || 0;
+          console.log(`Video ${sermonId}-${index}: ${progressPct}% complete`);
+
+          if (result.status === "ready") {
+            const localPath = await downloadVideoContent(videoId, `${sermonId}-scene${index}.mp4`);
+            scenes[index].videoUrl = localPath;
+            scenes[index].videoStatus = "ready";
+            const trackingKey = `${sermonId}-${index}`;
+            const job = videoGenerationJobs.get(trackingKey);
+            if (job) { job.status = "ready"; job.url = localPath; }
+            completedVideos++;
+            const videoProg = 72 + Math.round((completedVideos / totalVideos) * 23);
+            updateProgress(`Videos ready: ${completedVideos} of ${totalVideos}`, videoProg);
+            console.log(`Video ready for ${sermonId}-${index}: ${localPath}`);
+            return;
+          }
+
+          if (result.status === "failed") {
+            scenes[index].videoStatus = "failed";
+            completedVideos++;
+            console.error(`Video generation failed for ${sermonId}-${index}`);
+            return;
+          }
+        }
+        scenes[index].videoStatus = "failed";
+        completedVideos++;
+        console.error(`Video generation timed out for ${sermonId}-${index}`);
+      } catch (err) {
+        console.error(`Video error for ${sermonId}-${index}:`, err);
+        scenes[index].videoStatus = "failed";
+        completedVideos++;
+      }
+    }));
+  }
+
+  // Step 7: Final assembly — all videos are downloaded
+  updateProgress("Assembling experience...", 98);
   sermon.status = "ready";
   sermon.progress = 100;
   sermon.currentStep = "Complete";

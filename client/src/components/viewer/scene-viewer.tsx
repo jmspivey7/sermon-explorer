@@ -44,7 +44,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   const [showButtons, setShowButtons] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(scene.videoUrl || null);
-  const [videoLoading, setVideoLoading] = useState(!scene.videoUrl && scene.videoStatus === "generating");
   const [videoBuffering, setVideoBuffering] = useState(false);
   const [narrationStarted, setNarrationStarted] = useState(false);
 
@@ -55,7 +54,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   const narrative = scene.narratives?.[ageGroup] || scene.content;
   const gradient = EMOTION_GRADIENTS[scene.emotion] || EMOTION_GRADIENTS.hope;
   const icon = EMOTION_ICONS[scene.emotion] || "📖";
-  const kenBurnsClass = `ken-${scene.animationHint || "zoom-in"}`;
 
   const hasVideo = !!videoUrl;
 
@@ -101,7 +99,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     setShowButtons(false);
     setNarrationStarted(false);
     setVideoUrl(scene.videoUrl || null);
-    setVideoLoading(!scene.videoUrl && scene.videoStatus === "generating");
     setVideoBuffering(false);
 
     const contentTimer = setTimeout(() => setShowContent(true), 1000);
@@ -123,40 +120,10 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   }, [sceneIndex]);
 
   useEffect(() => {
-    if (scene.videoUrl && scene.videoStatus === "ready") {
-      if (!videoUrl || videoUrl !== scene.videoUrl) {
-        console.log(`[SceneViewer] Scene ${sceneIndex}: video ready from props: ${scene.videoUrl}`);
-        setVideoUrl(scene.videoUrl);
-        setVideoLoading(false);
-      }
-      return;
+    if (scene.videoUrl && scene.videoUrl !== videoUrl) {
+      setVideoUrl(scene.videoUrl);
     }
-
-    if (!scene.videoUrl && scene.videoStatus === "generating" && sermonId) {
-      setVideoLoading(true);
-      console.log(`[SceneViewer] Scene ${sceneIndex}: starting video poll`);
-      const interval = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/sermons/${sermonId}/scenes/${sceneIndex}/video-status`);
-          const data = await res.json();
-          console.log(`[SceneViewer] Scene ${sceneIndex}: poll result: ${data.videoStatus}, url: ${data.videoUrl}`);
-          if (data.videoStatus === "ready" && data.videoUrl) {
-            setVideoUrl(data.videoUrl);
-            setVideoLoading(false);
-            setVideoDone(false);
-            setShowButtons(false);
-            clearInterval(interval);
-          } else if (data.videoStatus === "failed") {
-            setVideoLoading(false);
-            clearInterval(interval);
-          }
-        } catch {
-          // keep polling
-        }
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [scene.videoUrl, scene.videoStatus, sermonId, sceneIndex, videoUrl]);
+  }, [scene.videoUrl]);
 
   useEffect(() => {
     if (hasVideo) {
@@ -171,11 +138,11 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   }, [narrationDone, videoDone, hasVideo]);
 
   useEffect(() => {
-    if (!hasVideo && !videoLoading) {
+    if (!hasVideo) {
       const fallbackTimer = setTimeout(() => setVideoDone(true), 12000);
       return () => clearTimeout(fallbackTimer);
     }
-  }, [hasVideo, videoLoading, sceneIndex]);
+  }, [hasVideo, sceneIndex]);
 
   function handleVideoEnded() {
     setVideoDone(true);
@@ -247,19 +214,11 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               <img
                 src={scene.imageUrl}
                 alt={scene.title}
-                className={`w-full h-full object-cover ${kenBurnsClass}`}
+                className="w-full h-full object-cover"
               />
             ) : (
-              <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center ${kenBurnsClass}`}>
+              <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
                 <span className="text-7xl block mb-2">{icon}</span>
-              </div>
-            )}
-            {videoLoading && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-se-navy/80 backdrop-blur-sm rounded-2xl px-5 py-3 flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 text-se-teal animate-spin" />
-                  <span className="text-white/80 font-display text-sm">Generating animation...</span>
-                </div>
               </div>
             )}
           </>

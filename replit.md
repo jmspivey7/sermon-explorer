@@ -73,12 +73,13 @@ script/
 ## Video Generation Flow
 
 1. Upload endpoint receives sermon + optional `videoModel` parameter
-2. Pipeline generates DALL-E images first (fast, used as fallback)
-3. Sora 2 video generation starts in background for each scene
-4. Videos are polled every 15 seconds until completion
-5. Completed MP4s are downloaded from OpenAI and saved to `generated/videos/`
-6. Frontend polls for video status; auto-plays video when ready
-7. Ken Burns still-image effect used only as fallback when no video is available
+2. Pipeline generates DALL-E images first (fast, used as poster frames)
+3. All Sora 2 video generation jobs are started in parallel
+4. Quizzes and discussion prompts are generated while videos render
+5. Pipeline AWAITS all videos to complete and download before marking sermon as "ready"
+6. Completed MP4s are downloaded via `GET /v1/videos/{id}/content` and saved to `generated/videos/`
+7. Upload page holds user with progress bar until everything is ready (72-95% = video download phase)
+8. User only enters the viewer after all videos are downloaded — no "Generating animation..." overlays
 
 ## Notes
 
@@ -88,8 +89,7 @@ script/
 - Sora 2 API: `POST https://api.openai.com/v1/videos` with model `sora-2` or `sora-2-pro`
 - Video status check: `GET https://api.openai.com/v1/videos/{id}` — returns status/progress (no download_url field)
 - Video download: `GET https://api.openai.com/v1/videos/{id}/content` — returns MP4 binary stream when status is "completed"
-- Video generation runs in background with polling; frontend auto-refetches sermon data every 5s while videos generating
-- Viewer useQuery has refetchInterval to keep scene props updated with latest videoUrl values
+- Video generation is fully synchronous in the pipeline — sermon not marked "ready" until all MP4s downloaded
 - Quiz data format: handles both flat array and `{ questions: [...] }` object format
 - Discussion prompts format: handles both flat array and `{ prompts: [...] }` object format
 - Vite config has `@assets` alias pointing to `attached_assets/` directory
