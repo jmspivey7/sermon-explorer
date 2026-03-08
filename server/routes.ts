@@ -279,6 +279,13 @@ CRITICAL STYLE AND CONTENT RULES:
 - NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
 - Characters must NEVER have open mouths or appear to be speaking.
 
+CONTENT SAFETY RULES (MANDATORY):
+- NEVER include alcohol, beer, wine, liquor, bottles of alcohol, bars, pubs, taverns, or any drinking establishments in image prompts. Even if the sermon references such topics, the image must depict a wholesome, child-appropriate alternative setting.
+- NEVER include drugs, drug paraphernalia, smoking, cigarettes, vaping, or any substance use imagery.
+- NEVER include weapons, violence, blood, or frightening imagery.
+- NEVER include gambling imagery (slot machines, poker, etc.).
+- All scenes must be suitable for children ages 4-12. When a sermon discusses adult topics (addiction, temptation, worldly distractions), illustrate them through safe metaphors: a child at a crossroads, a stormy sea becoming calm, a dimly lit path vs. a bright path, etc.
+
 REAL-WORLD ILLUSTRATION RULE:
 - If the pastor used a memorable real-world example, analogy, or personal story in the sermon (e.g., jumping off a high dive to illustrate overcoming fear, or a child sharing a lunchbox to illustrate generosity), then 1-2 of the scenes (roughly 10-20% of total scenes) should have their imagePrompt depict that real-world illustration in a modern-day setting rather than a biblical setting. These scenes should still use the same colorful cinematic 3D animated style, but show the modern scenario the pastor described (a swimming pool, a school cafeteria, etc.).
 - If the sermon does NOT contain any real-world examples or personal stories, then ALL imagePrompts should use biblical settings as usual. Do not force modern-day scenes if none exist in the sermon.
@@ -323,6 +330,8 @@ ${text.substring(0, 12000)}`,
 SERMON ORDER RULE (MOST IMPORTANT): Scenes MUST follow the sermon's actual sequence from beginning to end. Do NOT rearrange or reorder content. Each scene should correspond to the next sequential section of the sermon.
 
 CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
+
+CONTENT SAFETY (MANDATORY): NEVER include alcohol, bars, pubs, drugs, smoking, weapons, violence, blood, gambling in image prompts. All scenes must be child-safe (ages 4-12). For adult topics, use safe metaphors: a crossroads, a stormy sea calming, a dim path vs. bright path.
 
 REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples or personal stories, 1-2 scenes (10-20%) should depict those modern-day illustrations instead of biblical settings. If no real-world examples exist, use biblical settings for all scenes.
 
@@ -399,6 +408,9 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
+  const safetyPrefix = "IMPORTANT: This image is for a children's storybook (ages 4-12). Do NOT include any alcohol, beer, wine, liquor, bars, pubs, drugs, smoking, weapons, violence, blood, gambling, or any adult/inappropriate content. All settings must be wholesome and child-safe. ";
+  const safePrompt = safetyPrefix + prompt;
+
   const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
   console.log(`Generating image with Imagen 4 for ${label}`);
 
@@ -415,7 +427,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
 
       const response = await client.models.generateImages({
         model: "imagen-4.0-generate-001",
-        prompt,
+        prompt: safePrompt,
         config: {
           numberOfImages: 1,
           aspectRatio: "16:9",
