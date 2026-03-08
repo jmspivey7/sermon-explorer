@@ -614,15 +614,21 @@ async function generateScenes(text: string, analysis: any) {
         role: "system",
         content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
+CRITICAL STYLE AND CONTENT RULES:
+- All visuals must be in a Pixar/Disney 3D animation style: colorful, stylized, expressive characters with big eyes, smooth 3D rendering, warm cinematic lighting. NOT realistic, NOT watercolor — think Pixar movie quality.
+- NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
+- Characters must NEVER have mouth movements, speaking gestures, or dialog. No characters should appear to be talking. Show characters listening, thinking, walking, looking, gesturing — but never speaking.
+- No background music, sound effects, or dialog should be described in video prompts. The videos are silent visual animations only.
+
 For each scene, provide:
 - title: A short, engaging scene title
 - content: The core teaching content of this scene (2-3 paragraphs from the sermon)
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed DALL-E prompt for a warm, child-friendly watercolor-style illustration. The style should be: soft watercolor with warm lighting, diverse characters, biblical setting with gentle colors, suitable for children ages 4-12. Never include text in images. Be specific about the scene composition.
-- videoPrompt: A detailed prompt for a 10-second animated video of this scene. Describe gentle motion and action: characters moving, wind blowing, light shifting, camera panning slowly. Use warm, soft watercolor animation style with biblical setting. The video should feel like a gentle animated storybook illustration coming to life. Keep motion subtle and calming, suitable for children. Never include text or words in the video.
-- animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade" - suggests the Ken Burns motion
+- imagePrompt: A detailed DALL-E prompt for a Pixar/Disney 3D animated style illustration. Colorful, stylized characters with expressive faces, smooth 3D rendering, warm cinematic lighting, biblical setting. Suitable for children ages 4-12. Never include text in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking.
+- videoPrompt: A detailed prompt for a 12-second Pixar-style 3D animated video of this scene. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Pixar/Disney 3D animation style with warm cinematic lighting and rich colors. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
+- animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
       },
@@ -652,14 +658,16 @@ ${text.substring(0, 12000)}`,
           role: "system",
           content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
+CRITICAL RULES: Pixar/Disney 3D animation style only (NOT realistic). NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No mouth movements or speaking gestures. No background music or dialog in video prompts.
+
 For each scene, provide:
 - title: A short, engaging scene title
 - content: The core teaching content of this scene (1-2 paragraphs from the sermon)
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A DALL-E prompt for a warm, child-friendly watercolor illustration. Soft watercolor, warm lighting, diverse characters, biblical setting, suitable for children ages 4-12. No text in images.
-- videoPrompt: A prompt for a 10-second animated video. Describe gentle motion: characters moving, light shifting, camera panning. Warm watercolor animation style, biblical setting, gentle animated storybook. Keep motion subtle and calming. No text.
+- imagePrompt: A DALL-E prompt for Pixar/Disney 3D animated style. Colorful, stylized characters, smooth 3D rendering, warm cinematic lighting, biblical setting. No text. Never depict God or Jesus — use symbolic light. No open mouths.
+- videoPrompt: A prompt for a 12-second Pixar-style 3D animated video. Gentle motion: characters walking, reacting, light shifting, camera panning. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,

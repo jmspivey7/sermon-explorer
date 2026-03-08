@@ -101,16 +101,13 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     setVideoUrl(scene.videoUrl || null);
     setVideoBuffering(false);
 
-    const contentTimer = setTimeout(() => setShowContent(true), 1000);
+    const contentTimer = setTimeout(() => setShowContent(true), 500);
 
-    const narrationTimer = setTimeout(() => {
-      startNarration();
-    }, 1500);
+    startNarration();
 
     return () => {
       narrationAbortRef.current = true;
       clearTimeout(contentTimer);
-      clearTimeout(narrationTimer);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -150,9 +147,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
       if (audioRef.current) {
         audioRef.current.muted = newMuted;
       }
-      if (videoRef.current) {
-        videoRef.current.muted = newMuted;
-      }
       return newMuted;
     });
   }
@@ -175,15 +169,10 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               poster={scene.imageUrl || undefined}
               onEnded={() => {
                 setVideoDone(true);
-                if (videoRef.current) {
-                  videoRef.current.currentTime = 0;
-                  videoRef.current.play().catch(() => {});
-                }
               }}
               onLoadedData={() => {
                 setVideoBuffering(false);
                 if (videoRef.current) {
-                  videoRef.current.muted = isMuted;
                   videoRef.current.play().catch(() => {});
                 }
               }}

@@ -49,8 +49,13 @@ script/
 - Upload sermons as .docx, .pdf, or .txt files
 - AI pipeline: analyze → scene breakdown → age-adaptive narratives → DALL-E illustrations → Sora 2 animated MP4 videos → quizzes → discussion prompts
 - True animated video scenes via OpenAI Sora 2 API (real motion, not Ken Burns effects)
+- Pixar/Disney 3D animation style — no realistic rendering
+- Never depicts God, Jesus, or the Holy Spirit — uses symbolic light/warmth instead
+- No mouth movements or speaking gestures on characters
+- Videos are always muted — narration is the only audible sound
+- Videos play exactly once then stop; Next button appears after both video and narration finish
 - Videos downloaded and cached locally in `generated/videos/` for persistence
-- Auto-narration via TTS when each scene loads
+- Auto-narration via TTS starts immediately when each scene appears
 - Configurable video quality: Standard (sora-2) or Pro (sora-2-pro) — selectable on upload page
 - Three age groups: Young (4-6), Older (7-10), Family (11+)
 - Fixed bottom action bar with Next Scene / Skip buttons
