@@ -7,7 +7,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion + CDM Brand
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
-- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Google Gemini Imagen 3 for illustrations
+- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Google Gemini Imagen 4 for illustrations
 
 ## Project Structure
 
@@ -40,7 +40,7 @@ script/
 ## Environment Variables
 
 - `OPENAI_API_KEY` (secret) — Required for AI content generation (GPT-4o) and TTS narration
-- `GEMINI_API_KEY` (secret) — Required for image generation via Google Gemini Imagen 3
+- `GEMINI_API_KEY` (secret) — Required for image generation via Google Gemini Imagen 4
 
 ## Key Features
 
@@ -69,11 +69,11 @@ script/
 - `POST /api/generate-quiz` - Generate quiz questions
 - `GET /generated/images/*` - Serve generated image files
 
-## Image Generation (Gemini Imagen 3)
+## Image Generation (Gemini Imagen 4)
 
-- API: `POST https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=GEMINI_API_KEY`
-- Request: `{ instances: [{ prompt }], parameters: { aspectRatio: "16:9", numberOfImages: 1 } }`
-- Response: `predictions[0].bytesBase64Encoded` — base64-encoded image data
+- Uses `@google/genai` SDK: `client.models.generateImages()` with model `imagen-4.0-generate-001`
+- Config: `{ numberOfImages: 1, aspectRatio: "16:9" }`
+- Response: `response.generatedImages[0].image.imageBytes` — base64-encoded image data
 - Images saved locally to `generated/images/` as PNG files
 - URLs returned as `/generated/images/<sermonId>-scene<index>.png`
 

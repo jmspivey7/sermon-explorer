@@ -381,48 +381,35 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is required for image generation");
 
-  console.log(`Generating image with Imagen 3 for ${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`);
+  const { GoogleGenAI } = await import("@google/genai");
+  const client = new GoogleGenAI({ apiKey });
 
-  const body = {
-    instances: [{ prompt }],
-    parameters: {
-      aspectRatio: "16:9",
+  console.log(`Generating image with Imagen 4 for ${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`);
+
+  const response = await client.models.generateImages({
+    model: "imagen-4.0-generate-001",
+    prompt,
+    config: {
       numberOfImages: 1,
+      aspectRatio: "16:9",
     },
-  };
+  });
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Imagen 3 API error:", response.status, errorText);
-    throw new Error(`Imagen 3 API error: ${response.status} - ${errorText}`);
+  if (!response.generatedImages || response.generatedImages.length === 0) {
+    throw new Error("Imagen returned no images");
   }
 
-  const result = await response.json() as any;
-
-  if (!result.predictions || result.predictions.length === 0) {
-    throw new Error("Imagen 3 returned no images");
+  const imageBytes = response.generatedImages[0].image?.imageBytes;
+  if (!imageBytes) {
+    throw new Error("Imagen returned empty image data");
   }
-
-  const prediction = result.predictions[0];
-  const imageData = prediction.bytesBase64Encoded;
-  const mimeType = prediction.mimeType || "image/png";
-  const ext = mimeType === "image/jpeg" ? ".jpg" : ".png";
 
   const filename = sermonId && sceneIndex !== undefined
-    ? `${sermonId}-scene${sceneIndex}${ext}`
-    : `image-${Date.now()}${ext}`;
+    ? `${sermonId}-scene${sceneIndex}.png`
+    : `image-${Date.now()}.png`;
 
   const filePath = path.join(IMAGES_DIR, filename);
-  const buffer = Buffer.from(imageData, "base64");
+  const buffer = Buffer.from(imageBytes, "base64");
   fs.writeFileSync(filePath, buffer);
   console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
 
