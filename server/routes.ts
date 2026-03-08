@@ -631,7 +631,7 @@ async function generateScenes(text: string, analysis: any) {
         content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
 CRITICAL STYLE AND CONTENT RULES:
-- All visuals must be in a Pixar/Disney 3D animation style: colorful, stylized, expressive characters with big eyes, smooth 3D rendering, warm cinematic lighting. NOT realistic, NOT watercolor — think Pixar movie quality.
+- All visuals must be in a colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
 - NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
 - Characters must NEVER have mouth movements, speaking gestures, or dialog. No characters should appear to be talking. Show characters listening, thinking, walking, looking, gesturing — but never speaking.
 - No background music, sound effects, or dialog should be described in video prompts. The videos are silent visual animations only.
@@ -642,8 +642,8 @@ For each scene, provide:
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed DALL-E prompt for a Pixar/Disney 3D animated style illustration. Colorful, stylized characters with expressive faces, smooth 3D rendering, warm cinematic lighting, biblical setting. Suitable for children ages 4-12. Never include text in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking.
-- videoPrompt: A detailed prompt for an 8-second Pixar-style 3D animated video of this scene. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Pixar/Disney 3D animation style with warm cinematic lighting and rich colors. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
+- imagePrompt: A detailed DALL-E prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting, biblical setting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking.
+- videoPrompt: A detailed prompt for an 8-second colorful cinematic 3D animated video of this scene, in the style of a modern family animated feature film with expressive big-eyed characters and soft global lighting. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Warm cinematic lighting and rich colors. No copyrighted characters or recognizable brands. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -674,7 +674,7 @@ ${text.substring(0, 12000)}`,
           role: "system",
           content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
-CRITICAL RULES: Pixar/Disney 3D animation style only (NOT realistic). NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No mouth movements or speaking gestures. No background music or dialog in video prompts.
+CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No mouth movements or speaking gestures. No background music or dialog in video prompts.
 
 For each scene, provide:
 - title: A short, engaging scene title
@@ -682,8 +682,8 @@ For each scene, provide:
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A DALL-E prompt for Pixar/Disney 3D animated style. Colorful, stylized characters, smooth 3D rendering, warm cinematic lighting, biblical setting. No text. Never depict God or Jesus — use symbolic light. No open mouths.
-- videoPrompt: A prompt for an 8-second Pixar-style 3D animated video. Gentle motion: characters walking, reacting, light shifting, camera panning. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
+- imagePrompt: A DALL-E prompt for a colorful cinematic 3D animated style with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting, biblical setting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths.
+- videoPrompt: A prompt for an 8-second colorful cinematic 3D animated video in the style of a modern family animated feature film. Gentle motion: characters walking, reacting, light shifting, camera panning. No copyrighted characters or recognizable brands. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,

@@ -18,7 +18,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:37",
       keyPoint: "Jesus shows up even for people who don't understand him.",
       emotion: "curiosity",
-      imagePrompt: "Pixar-style 3D animated illustration of a biblical dinner scene. A warm golden glow enters through an arched doorway into a low-lit dining room. Several stylized men in robes sit around a low table laden with bread and fruit. Warm cinematic lighting with rich colors. Characters have closed mouths, looking curiously toward the doorway. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a biblical dinner scene. A warm golden glow enters through an arched doorway into a low-lit dining room. Several stylized men in robes sit around a low table laden with bread and fruit. Warm cinematic lighting with rich colors. Characters have closed mouths, looking curiously toward the doorway. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "zoom-in",
       narratives: {
         young: "Jesus went to eat dinner at a man's house. The man wanted to watch Jesus very carefully. But Jesus wasn't scared. He went because he cared about everyone, even people who didn't like him.",
@@ -48,7 +48,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:38",
       keyPoint: "Jesus challenges man-made rules that miss God's heart.",
       emotion: "surprise",
-      imagePrompt: "Pixar-style 3D animated illustration of a biblical dining scene. A calm figure surrounded by warm golden light sits at a low table while stylized men in elaborate robes look shocked with wide eyes and raised eyebrows. A decorative washing basin sits unused nearby. Rich cinematic colors. Characters have closed mouths. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a biblical dining scene. A calm figure surrounded by warm golden light sits at a low table while stylized men in elaborate robes look shocked with wide eyes and raised eyebrows. A decorative washing basin sits unused nearby. Rich cinematic colors. Characters have closed mouths. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "pan-left",
       narratives: {
         young: "When Jesus sat down to eat, he didn't wash his hands the special way the other men expected. They were really surprised! But Jesus wanted to show them that what's in your heart is more important than following extra rules.",
@@ -78,7 +78,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:39-40",
       keyPoint: "God sees what's really inside us, not just what we show the world.",
       emotion: "conviction",
-      imagePrompt: "Pixar-style 3D animated illustration showing two stylized cups side by side. One cup is beautifully polished and shiny on the outside but dark and dirty inside. The other cup is simple but clean and glowing inside with warm golden light. Rich cinematic colors with teal and amber tones. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration showing two stylized cups side by side. One cup is beautifully polished and shiny on the outside but dark and dirty inside. The other cup is simple but clean and glowing inside with warm golden light. Rich cinematic colors with teal and amber tones. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "zoom-in",
       narratives: {
         young: "Jesus talked about a cup. Imagine a cup that looks really clean and sparkly on the outside, but inside it's all yucky and dirty. Would you want to drink from that cup? Jesus said some people are like that cup. They look good on the outside, but inside, their hearts aren't clean.",
@@ -108,7 +108,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:42",
       keyPoint: "Don't get so caught up in small religious details that you miss justice and love.",
       emotion: "sadness",
-      imagePrompt: "Pixar-style 3D animated illustration of a stylized man carefully measuring tiny herbs on a small scale, while behind him through a window, people are in need reaching out for help. The man doesn't see them. Rich cinematic lighting with warm earth tones. Characters have closed mouths. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a stylized man carefully measuring tiny herbs on a small scale, while behind him through a window, people are in need reaching out for help. The man doesn't see them. Rich cinematic lighting with warm earth tones. Characters have closed mouths. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "pan-right",
       narratives: {
         young: "The Pharisees were very careful about small things. They even counted their tiny little plants to make sure they gave God exactly the right amount. But they forgot about the big things, like being kind and loving people! It's like making sure your shoelaces are perfectly tied while your friend is crying and needs a hug.",
@@ -138,7 +138,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:46",
       keyPoint: "Faith should lift people up, not weigh them down.",
       emotion: "compassion",
-      imagePrompt: "Pixar-style 3D animated illustration showing a stylized person struggling under a huge stack of heavy scrolls and books, bending under the weight. Nearby, well-dressed men watch with crossed arms, not helping. In the background, a warm golden radiant glow reaches toward the struggling person. Rich cinematic lighting. Characters have closed mouths. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration showing a stylized person struggling under a huge stack of heavy scrolls and books, bending under the weight. Nearby, well-dressed men watch with crossed arms, not helping. In the background, a warm golden radiant glow reaches toward the struggling person. Rich cinematic lighting. Characters have closed mouths. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "zoom-out",
       narratives: {
         young: "Some people were carrying really heavy things on their backs, so many rules and things they had to remember. And the leaders just stood and watched. They didn't help at all! But Jesus saw this and said, 'That's not right. I came to help you carry that.'",
@@ -168,7 +168,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:52",
       keyPoint: "No one should stand between people and God's love.",
       emotion: "urgency",
-      imagePrompt: "Pixar-style 3D animated illustration of a large golden key lying on the ground in front of a closed ornate door. Behind the door, warm golden light shines through the cracks. A stylized child reaches toward the key while robed figures stand blocking the path. Rich cinematic lighting with gold and teal tones. Characters have closed mouths. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a large golden key lying on the ground in front of a closed ornate door. Behind the door, warm golden light shines through the cracks. A stylized child reaches toward the key while robed figures stand blocking the path. Rich cinematic lighting with gold and teal tones. Characters have closed mouths. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "zoom-in",
       narratives: {
         young: "Imagine there's a beautiful door with something wonderful behind it. And you have the key! But instead of opening the door for everyone, the leaders hid the key. They didn't go through the door themselves, and they stopped other people from going through too. Jesus said, 'That's the worst thing you could do.'",
@@ -198,7 +198,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "Luke 11:53-54",
       keyPoint: "Jesus' confrontation is never cruelty; it is always compassion leading to the cross.",
       emotion: "hope",
-      imagePrompt: "Pixar-style 3D animated illustration of a warm golden light moving calmly along a sunlit path toward a distant city on a hill. Behind, shadows of stylized men pointing and arguing. The light moves with peace and purpose. Rich cinematic colors with teal sky and amber sunset. Characters have closed mouths. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a warm golden light moving calmly along a sunlit path toward a distant city on a hill. Behind, shadows of stylized men pointing and arguing. The light moves with peace and purpose. Rich cinematic colors with teal sky and amber sunset. Characters have closed mouths. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "pan-right",
       narratives: {
         young: "After Jesus said all those hard things, the leaders got really mad. They tried to trick him and catch him saying something wrong. But Jesus wasn't afraid. He kept going. He kept loving. He was walking to a place where he would show the biggest love of all.",
@@ -228,7 +228,7 @@ export const DEMO_SERMON_DATA = {
       scriptureRef: "",
       keyPoint: "Genuine repentance and grace are more transformative than any amount of religious performance.",
       emotion: "transformation",
-      imagePrompt: "Pixar-style 3D animated illustration of a stylized person kneeling with hands open, surrounded by warm golden light breaking through clouds. The scene transitions from dark shadows on one side to bright, colorful flowers blooming on the other, symbolizing inner transformation. Rich cinematic lighting with teal, amber, and gentle greens. Character has closed mouth and peaceful expression. Child-friendly Pixar animation style. No text.",
+      imagePrompt: "Colorful cinematic 3D animated illustration of a stylized person kneeling with hands open, surrounded by warm golden light breaking through clouds. The scene transitions from dark shadows on one side to bright, colorful flowers blooming on the other, symbolizing inner transformation. Rich cinematic lighting with teal, amber, and gentle greens. Character has closed mouth and peaceful expression. Child-friendly modern animated feature film style. No copyrighted characters or recognizable brands. No text.",
       animationHint: "fade",
       narratives: {
         young: "Sometimes we do wrong things and we try to hide them. But when we say 'I'm sorry' and really mean it, something amazing happens. God helps us change on the inside. And when other people see that change, it helps them know God too!",
