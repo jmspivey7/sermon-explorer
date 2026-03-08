@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, BookOpen, Volume2, VolumeX, Loader2 } from "lucide-react";
+import { ChevronRight, BookOpen, Volume2, VolumeX } from "lucide-react";
 import type { AgeGroup } from "@/pages/viewer";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -14,6 +14,14 @@ interface Props {
   onComplete: () => void;
   onSkip: () => void;
 }
+
+const KEN_BURNS_CLASSES: Record<string, string> = {
+  "zoom-in": "ken-zoom-in",
+  "zoom-out": "ken-zoom-out",
+  "pan-left": "ken-pan-left",
+  "pan-right": "ken-pan-right",
+  "fade": "ken-fade",
+};
 
 const EMOTION_GRADIENTS: Record<string, string> = {
   curiosity: "from-[#1d88a9] via-[#54636c] to-[#0f1d2e]",
@@ -39,23 +47,18 @@ const EMOTION_ICONS: Record<string, string> = {
 
 export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, userName, sermonId, onComplete, onSkip }: Props) {
   const [narrationDone, setNarrationDone] = useState(false);
-  const [videoDone, setVideoDone] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [videoUrl, setVideoUrl] = useState<string | null>(scene.videoUrl || null);
-  const [videoBuffering, setVideoBuffering] = useState(false);
   const [narrationStarted, setNarrationStarted] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const narrationAbortRef = useRef(false);
 
   const narrative = scene.narratives?.[ageGroup] || scene.content;
   const gradient = EMOTION_GRADIENTS[scene.emotion] || EMOTION_GRADIENTS.hope;
   const icon = EMOTION_ICONS[scene.emotion] || "📖";
-
-  const hasVideo = !!videoUrl;
+  const kenBurnsClass = KEN_BURNS_CLASSES[scene.animationHint] || "ken-zoom-in";
 
   const startNarration = useCallback(async () => {
     if (narrationStarted || narrationAbortRef.current) return;
@@ -94,12 +97,9 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   useEffect(() => {
     narrationAbortRef.current = false;
     setNarrationDone(false);
-    setVideoDone(false);
     setShowContent(false);
     setShowButtons(false);
     setNarrationStarted(false);
-    setVideoUrl(scene.videoUrl || null);
-    setVideoBuffering(false);
 
     const contentTimer = setTimeout(() => setShowContent(true), 500);
 
@@ -117,29 +117,10 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   }, [sceneIndex]);
 
   useEffect(() => {
-    if (scene.videoUrl && scene.videoUrl !== videoUrl) {
-      setVideoUrl(scene.videoUrl);
+    if (narrationDone) {
+      setShowButtons(true);
     }
-  }, [scene.videoUrl]);
-
-  useEffect(() => {
-    if (hasVideo) {
-      if (narrationDone && videoDone) {
-        setShowButtons(true);
-      }
-    } else {
-      if (narrationDone) {
-        setShowButtons(true);
-      }
-    }
-  }, [narrationDone, videoDone, hasVideo]);
-
-  useEffect(() => {
-    if (!hasVideo) {
-      const fallbackTimer = setTimeout(() => setVideoDone(true), 8000);
-      return () => clearTimeout(fallbackTimer);
-    }
-  }, [hasVideo, sceneIndex]);
+  }, [narrationDone]);
 
   function toggleMute() {
     setIsMuted((m) => {
@@ -156,54 +137,17 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
   return (
     <div className="pb-24 relative">
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-900">
-        {hasVideo ? (
-          <>
-            <video
-              ref={videoRef}
-              key={videoUrl}
-              src={videoUrl!}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              playsInline
-              poster={scene.imageUrl || undefined}
-              onEnded={() => {
-                setVideoDone(true);
-              }}
-              onLoadedData={() => {
-                setVideoBuffering(false);
-                if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
-                }
-              }}
-              onError={() => {
-                setVideoUrl(null);
-                setVideoDone(true);
-              }}
-              onWaiting={() => setVideoBuffering(true)}
-              onPlaying={() => setVideoBuffering(false)}
-              onCanPlay={() => setVideoBuffering(false)}
-            />
-            {videoBuffering && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <Loader2 className="w-8 h-8 text-white animate-spin" />
-              </div>
-            )}
-          </>
+        {scene.imageUrl ? (
+          <img
+            key={`${sceneIndex}-${scene.imageUrl}`}
+            src={scene.imageUrl}
+            alt={scene.title}
+            className={`w-full h-full object-cover ${kenBurnsClass}`}
+          />
         ) : (
-          <>
-            {scene.imageUrl ? (
-              <img
-                src={scene.imageUrl}
-                alt={scene.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                <span className="text-7xl block mb-2">{icon}</span>
-              </div>
-            )}
-          </>
+          <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+            <span className="text-7xl block mb-2">{icon}</span>
+          </div>
         )}
 
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent" />
@@ -223,8 +167,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
             <Volume2 className="w-4 h-4 text-gray-600" />
           )}
         </button>
-
-        
       </div>
 
       <div className="px-5 -mt-10 relative z-10">
@@ -312,7 +254,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
             <span className="font-display text-xs text-gray-400">
-              {!narrationDone ? "Listening..." : "Preparing..."}
+              Listening...
             </span>
           </div>
         </div>

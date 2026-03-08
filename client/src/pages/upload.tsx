@@ -1,9 +1,7 @@
 import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Upload, FileText, Loader2, CheckCircle, AlertCircle, Film } from "lucide-react";
-
-type VideoModel = "sora-2" | "sora-2-pro";
+import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function UploadPage() {
   const [, setLocation] = useLocation();
@@ -15,7 +13,6 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState("");
   const [error, setError] = useState("");
-  const [videoModel, setVideoModel] = useState<VideoModel>("sora-2");
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -30,7 +27,6 @@ export default function UploadPage() {
     try {
       const formData = new FormData();
       formData.append("sermon", file);
-      formData.append("videoModel", videoModel);
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
@@ -108,41 +104,10 @@ export default function UploadPage() {
 
             {file && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="mt-6 bg-gray-50 border border-gray-200 rounded-2xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Film className="w-4 h-4 text-se-blue" />
-                    <h3 className="font-display font-bold text-gray-800 text-sm">Video Quality</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => setVideoModel("sora-2")}
-                      className={`rounded-xl p-3 text-left transition-all border ${
-                        videoModel === "sora-2"
-                          ? "bg-se-blue/10 border-se-blue/60 text-gray-800"
-                          : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
-                      }`}
-                    >
-                      <p className="font-display font-bold text-sm">Standard</p>
-                      <p className="text-xs mt-0.5 opacity-70">Sora 2 — Fast</p>
-                    </button>
-                    <button
-                      onClick={() => setVideoModel("sora-2-pro")}
-                      className={`rounded-xl p-3 text-left transition-all border ${
-                        videoModel === "sora-2-pro"
-                          ? "bg-se-green/10 border-se-green/60 text-gray-800"
-                          : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
-                      }`}
-                    >
-                      <p className="font-display font-bold text-sm">Pro</p>
-                      <p className="text-xs mt-0.5 opacity-70">Sora 2 Pro — Best</p>
-                    </button>
-                  </div>
-                </div>
-
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={handleUpload}
-                  className="w-full mt-4 child-button bg-se-blue text-white"
+                  className="w-full mt-6 child-button bg-se-blue text-white"
                 >
                   Process Sermon
                 </motion.button>
@@ -162,7 +127,7 @@ export default function UploadPage() {
                 </div>
                 <div className="flex gap-3">
                   <span className="text-se-blue font-bold">3.</span>
-                  <p>Generates original artwork, quizzes, and discussion prompts</p>
+                  <p>Generates beautiful animated-style artwork for each scene</p>
                 </div>
                 <div className="flex gap-3">
                   <span className="text-se-blue font-bold">4.</span>
@@ -194,9 +159,7 @@ export default function UploadPage() {
             </h2>
             <p className="text-se-blue text-sm font-display">{currentStep || "Starting..."}</p>
             <p className="text-gray-400 text-xs mt-4 max-w-xs mx-auto">
-              {progress > 70
-                ? "Generating animated video scenes. This step takes several minutes — please keep this page open."
-                : "This may take several minutes"}
+              This may take a few minutes as we generate illustrations and content
             </p>
           </motion.div>
         )}

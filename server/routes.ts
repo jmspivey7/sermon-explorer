@@ -5,6 +5,7 @@ import mammoth from "mammoth";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
+import express from "express";
 import { DEMO_SERMON_DATA } from "@shared/demo-data";
 
 function getOpenAI(): OpenAI {
@@ -17,21 +18,16 @@ const openai = new Proxy({} as OpenAI, {
 });
 const upload = multer({ dest: "uploads/" });
 
-// In-memory store for processed sermons
 const processedSermons: Map<string, any> = new Map();
 
-// Load demo data on startup
 processedSermons.set("demo-luke-11", DEMO_SERMON_DATA);
 
+const IMAGES_DIR = path.resolve("generated", "images");
+fs.mkdirSync(IMAGES_DIR, { recursive: true });
+
 export async function registerRoutes(server: Server, app: Express) {
-  // Serve generated images
   app.use("/generated", express.static(path.resolve("generated")));
 
-  // ============================================
-  // SERMON MANAGEMENT
-  // ============================================
-
-  // List available sermons
   app.get("/api/sermons", (_req, res) => {
     const sermons = Array.from(processedSermons.entries()).map(([id, data]) => ({
       id,
@@ -44,7 +40,6 @@ export async function registerRoutes(server: Server, app: Express) {
     res.json(sermons);
   });
 
-  // Get full sermon data
   app.get("/api/sermons/:id", (req, res) => {
     const sermon = processedSermons.get(req.params.id);
     if (!sermon) return res.status(404).json({ message: "Sermon not found" });
@@ -58,19 +53,13 @@ export async function registerRoutes(server: Server, app: Express) {
     const sermonId = req.params.id;
     processedSermons.delete(sermonId);
 
-    const videosDir = path.resolve("generated", "videos");
-    if (fs.existsSync(videosDir)) {
-      const files = fs.readdirSync(videosDir);
+    const imagesDir = path.resolve("generated", "images");
+    if (fs.existsSync(imagesDir)) {
+      const files = fs.readdirSync(imagesDir);
       for (const file of files) {
         if (file.startsWith(sermonId)) {
-          fs.unlinkSync(path.join(videosDir, file));
+          fs.unlinkSync(path.join(imagesDir, file));
         }
-      }
-    }
-
-    for (const [key] of videoGenerationJobs) {
-      if (key.startsWith(sermonId)) {
-        videoGenerationJobs.delete(key);
       }
     }
 
@@ -78,7 +67,6 @@ export async function registerRoutes(server: Server, app: Express) {
     res.json({ message: "Sermon deleted" });
   });
 
-  // Get a specific scene
   app.get("/api/sermons/:id/scenes/:sceneIndex", (req, res) => {
     const sermon = processedSermons.get(req.params.id);
     if (!sermon) return res.status(404).json({ message: "Sermon not found" });
@@ -86,10 +74,6 @@ export async function registerRoutes(server: Server, app: Express) {
     if (!scene) return res.status(404).json({ message: "Scene not found" });
     res.json(scene);
   });
-
-  // ============================================
-  // UPLOAD & PROCESSING PIPELINE
-  // ============================================
 
   app.post("/api/upload", upload.single("sermon"), async (req, res) => {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -99,7 +83,6 @@ export async function registerRoutes(server: Server, app: Express) {
     const fileName = req.file.originalname;
 
     try {
-      // Step 1: Extract text
       let text = "";
       if (fileName.endsWith(".docx")) {
         const result = await mammoth.extractRawText({ path: filePath });
@@ -115,7 +98,6 @@ export async function registerRoutes(server: Server, app: Express) {
         return res.status(400).json({ message: "Unsupported file type. Use .docx, .pdf, or .txt" });
       }
 
-      // Initialize sermon entry
       processedSermons.set(sermonId, {
         id: sermonId,
         title: "Processing...",
@@ -126,12 +108,9 @@ export async function registerRoutes(server: Server, app: Express) {
         createdAt: new Date().toISOString(),
       });
 
-      const videoModel = req.body?.videoModel || undefined;
-
       res.json({ sermonId, status: "processing", message: "Sermon uploaded. Processing started." });
 
-      // Run pipeline in background
-      processSermon(sermonId, text, videoModel).catch((err) => {
+      processSermon(sermonId, text).catch((err) => {
         console.error("Pipeline error:", err);
         const sermon = processedSermons.get(sermonId);
         if (sermon) {
@@ -142,31 +121,21 @@ export async function registerRoutes(server: Server, app: Express) {
     } catch (err: any) {
       res.status(500).json({ message: "Upload failed", error: err.message });
     } finally {
-      // Clean up uploaded file
       fs.unlink(filePath, () => {});
     }
   });
 
-  // Check processing status
   app.get("/api/sermons/:id/status", (req, res) => {
     const sermon = processedSermons.get(req.params.id);
     if (!sermon) return res.status(404).json({ message: "Sermon not found" });
-    const readyVideos = sermon.scenes?.filter((s: any) => s.videoStatus === "ready").length || 0;
-    const totalScenes = sermon.scenes?.length || 0;
     res.json({
       status: sermon.status,
       progress: sermon.progress || 0,
       currentStep: sermon.currentStep || "",
-      sceneCount: totalScenes,
-      videosReady: readyVideos,
+      sceneCount: sermon.scenes?.length || 0,
     });
   });
 
-  // ============================================
-  // AI GENERATION ENDPOINTS (for on-demand use)
-  // ============================================
-
-  // Generate TTS for a scene narration
   app.post("/api/tts", async (req, res) => {
     try {
       const { text, voice } = req.body;
@@ -184,13 +153,11 @@ export async function registerRoutes(server: Server, app: Express) {
     }
   });
 
-  // Generate image for a scene (on-demand)
   app.post("/api/generate-image", async (req, res) => {
     try {
       const { prompt, sceneIndex, sermonId } = req.body;
-      const imageUrl = await generateImage(prompt);
+      const imageUrl = await generateImage(prompt, sermonId, sceneIndex);
 
-      // If sermonId provided, update the scene
       if (sermonId && sceneIndex !== undefined) {
         const sermon = processedSermons.get(sermonId);
         if (sermon?.scenes?.[sceneIndex]) {
@@ -204,7 +171,6 @@ export async function registerRoutes(server: Server, app: Express) {
     }
   });
 
-  // Generate additional quiz questions for a scene
   app.post("/api/generate-quiz", async (req, res) => {
     try {
       const { sceneContent, ageGroup } = req.body;
@@ -214,249 +180,13 @@ export async function registerRoutes(server: Server, app: Express) {
       res.status(500).json({ message: "Quiz generation failed", error: err.message });
     }
   });
-
-  // Generate video for a scene (on-demand via Sora 2 API)
-  app.post("/api/generate-video", async (req, res) => {
-    try {
-      const { prompt, sceneIndex, sermonId, model } = req.body;
-      if (!prompt) return res.status(400).json({ message: "prompt is required" });
-
-      const videoResult = await generateVideo(prompt, model);
-
-      if (sermonId && sceneIndex !== undefined) {
-        const sermon = processedSermons.get(sermonId);
-        if (sermon?.scenes?.[sceneIndex]) {
-          sermon.scenes[sceneIndex].videoUrl = videoResult.url;
-          sermon.scenes[sceneIndex].videoStatus = "ready";
-        }
-      }
-
-      res.json({ videoUrl: videoResult.url, status: "ready" });
-    } catch (err: any) {
-      console.error("Video generation failed:", err);
-      res.status(500).json({ message: "Video generation failed", error: err.message });
-    }
-  });
-
-  // Start async video generation for a scene
-  app.post("/api/generate-video-async", async (req, res) => {
-    try {
-      const { prompt, sceneIndex, sermonId, model } = req.body;
-      if (!prompt) return res.status(400).json({ message: "prompt is required" });
-
-      const videoId = await startVideoGeneration(prompt, model);
-      const trackingKey = `${sermonId}-${sceneIndex}`;
-      videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
-
-      if (sermonId && sceneIndex !== undefined) {
-        const sermon = processedSermons.get(sermonId);
-        if (sermon?.scenes?.[sceneIndex]) {
-          sermon.scenes[sceneIndex].videoStatus = "generating";
-        }
-      }
-
-      pollVideoCompletion(trackingKey, videoId, sermonId, sceneIndex);
-
-      res.json({ videoId, trackingKey, status: "generating" });
-    } catch (err: any) {
-      console.error("Video generation start failed:", err);
-      res.status(500).json({ message: "Video generation failed", error: err.message });
-    }
-  });
-
-  // Check video generation status
-  app.get("/api/video-status/:trackingKey", (req, res) => {
-    const job = videoGenerationJobs.get(req.params.trackingKey);
-    if (!job) return res.status(404).json({ message: "No video job found" });
-    res.json({ status: job.status, videoUrl: job.url });
-  });
-
-  // Check video status by sermon/scene
-  app.get("/api/sermons/:id/scenes/:sceneIndex/video-status", (req, res) => {
-    const sermon = processedSermons.get(req.params.id);
-    if (!sermon) return res.status(404).json({ message: "Sermon not found" });
-    const scene = sermon.scenes?.[parseInt(req.params.sceneIndex)];
-    if (!scene) return res.status(404).json({ message: "Scene not found" });
-    res.json({
-      videoStatus: scene.videoStatus || "none",
-      videoUrl: scene.videoUrl || null,
-      imageUrl: scene.imageUrl || null,
-    });
-  });
-}
-
-// ============================================
-// VIDEO GENERATION (OpenAI Videos API - Sora 2)
-// ============================================
-
-const SORA_MODEL = process.env.SORA_MODEL || "sora-2";
-const SORA_VIDEO_SECONDS = process.env.SORA_VIDEO_SECONDS || "8";
-const VIDEOS_DIR = path.resolve("generated", "videos");
-fs.mkdirSync(VIDEOS_DIR, { recursive: true });
-
-const videoGenerationJobs: Map<string, { videoId: string; status: string; url: string | null }> = new Map();
-
-async function startVideoGeneration(prompt: string, model?: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is required for video generation");
-
-  const useModel = model || SORA_MODEL;
-  console.log(`Starting video generation with model=${useModel}, seconds=${SORA_VIDEO_SECONDS}`);
-
-  const response = await fetch("https://api.openai.com/v1/videos", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: useModel,
-      prompt: prompt,
-      size: "1280x720",
-      seconds: SORA_VIDEO_SECONDS,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Sora API error:", response.status, errorText);
-    throw new Error(`Sora API error: ${response.status} - ${errorText}`);
-  }
-
-  const data = await response.json() as any;
-  console.log(`Video job created: ${data.id}, status: ${data.status}`);
-  return data.id;
-}
-
-async function checkVideoStatus(videoId: string): Promise<{ status: string; videoId: string; progress?: number }> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is required");
-
-  const response = await fetch(`https://api.openai.com/v1/videos/${videoId}`, {
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Sora status check error: ${response.status} - ${errorText}`);
-  }
-
-  const data = await response.json() as any;
-
-  if (data.status === "completed") {
-    return { status: "ready", videoId, progress: 100 };
-  } else if (data.status === "failed") {
-    return { status: "failed", videoId };
-  }
-
-  return { status: "generating", videoId, progress: data.progress || 0 };
-}
-
-async function downloadVideoContent(videoId: string, filename: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY is required");
-
-  const response = await fetch(`https://api.openai.com/v1/videos/${videoId}/content`, {
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Video download failed: ${response.status} - ${errorText}`);
-  }
-
-  const buffer = Buffer.from(await response.arrayBuffer());
-  const filePath = path.join(VIDEOS_DIR, filename);
-  fs.writeFileSync(filePath, buffer);
-  console.log(`Video downloaded and saved: ${filePath} (${(buffer.length / 1024 / 1024).toFixed(1)}MB)`);
-  return `/generated/videos/${filename}`;
-}
-
-async function generateVideo(prompt: string, model?: string): Promise<{ url: string }> {
-  const videoId = await startVideoGeneration(prompt, model);
-
-  let attempts = 0;
-  const maxAttempts = 60;
-  while (attempts < maxAttempts) {
-    await new Promise((resolve) => setTimeout(resolve, 15000));
-    attempts++;
-
-    const result = await checkVideoStatus(videoId);
-    if (result.status === "ready") {
-      const localPath = await downloadVideoContent(videoId, `${videoId}.mp4`);
-      return { url: localPath };
-    }
-    if (result.status === "failed") {
-      throw new Error("Video generation failed on Sora side");
-    }
-  }
-
-  throw new Error("Video generation timed out after 15 minutes");
-}
-
-function pollVideoCompletion(trackingKey: string, videoId: string, sermonId: string, sceneIndex: number) {
-  const poll = async () => {
-    let attempts = 0;
-    const maxAttempts = 60;
-    while (attempts < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, 15000));
-      attempts++;
-
-      try {
-        const result = await checkVideoStatus(videoId);
-        const job = videoGenerationJobs.get(trackingKey);
-
-        if (result.status === "ready") {
-          const localPath = await downloadVideoContent(videoId, `${sermonId}-scene${sceneIndex}.mp4`);
-
-          if (job) {
-            job.status = "ready";
-            job.url = localPath;
-          }
-          const sermon = processedSermons.get(sermonId);
-          if (sermon?.scenes?.[sceneIndex]) {
-            sermon.scenes[sceneIndex].videoUrl = localPath;
-            sermon.scenes[sceneIndex].videoStatus = "ready";
-          }
-          console.log(`Video ready for ${trackingKey}: ${localPath}`);
-          return;
-        }
-
-        if (result.status === "failed") {
-          if (job) job.status = "failed";
-          const sermon = processedSermons.get(sermonId);
-          if (sermon?.scenes?.[sceneIndex]) {
-            sermon.scenes[sceneIndex].videoStatus = "failed";
-          }
-          console.error(`Video generation failed for ${trackingKey}`);
-          return;
-        }
-
-        if (result.progress !== undefined) {
-          console.log(`Video ${trackingKey}: ${result.progress}% complete`);
-        }
-      } catch (err) {
-        console.error(`Error polling video ${trackingKey}:`, err);
-      }
-    }
-
-    const job = videoGenerationJobs.get(trackingKey);
-    if (job) job.status = "failed";
-    console.error(`Video generation timed out for ${trackingKey}`);
-  };
-
-  poll().catch(console.error);
 }
 
 // ============================================
 // PROCESSING PIPELINE
 // ============================================
 
-async function processSermon(sermonId: string, text: string, videoModel?: string) {
+async function processSermon(sermonId: string, text: string) {
   const sermon = processedSermons.get(sermonId)!;
 
   const updateProgress = (step: string, progress: number) => {
@@ -464,7 +194,6 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     sermon.progress = progress;
   };
 
-  // Step 1: Analyze sermon structure
   updateProgress("Analyzing sermon structure...", 10);
   const analysis = await analyzeSermon(text);
   sermon.title = analysis.title;
@@ -472,12 +201,10 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
   sermon.summary = analysis.summary;
   sermon.keyThemes = analysis.keyThemes;
 
-  // Step 2: Generate scene breakdowns
   updateProgress("Breaking sermon into scenes...", 20);
   const scenes = await generateScenes(text, analysis);
   sermon.scenes = scenes;
 
-  // Step 3: Generate age-adaptive narratives for each scene
   updateProgress("Writing age-appropriate narratives...", 35);
   for (let i = 0; i < scenes.length; i++) {
     updateProgress(`Writing narratives for scene ${i + 1}/${scenes.length}...`, 35 + (i / scenes.length) * 15);
@@ -485,13 +212,11 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     scenes[i].narratives = narratives;
   }
 
-  // Step 4: Generate images first (fast), then start video generation in background
   updateProgress("Generating illustrations...", 50);
-  fs.mkdirSync("generated", { recursive: true });
   for (let i = 0; i < scenes.length; i++) {
-    updateProgress(`Illustrating scene ${i + 1}/${scenes.length}...`, 50 + (i / scenes.length) * 15);
+    updateProgress(`Illustrating scene ${i + 1}/${scenes.length}...`, 50 + (i / scenes.length) * 25);
     try {
-      const imageUrl = await generateImage(scenes[i].imagePrompt);
+      const imageUrl = await generateImage(scenes[i].imagePrompt, sermonId, i);
       scenes[i].imageUrl = imageUrl;
     } catch (err) {
       console.error(`Image gen failed for scene ${i}:`, err);
@@ -499,25 +224,7 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     }
   }
 
-  // Step 4b: Start ALL video generation jobs in parallel
-  updateProgress("Starting video animations...", 65);
-  const videoJobs: Array<{ index: number; videoId: string }> = [];
-  for (let i = 0; i < scenes.length; i++) {
-    const videoPrompt = scenes[i].videoPrompt || scenes[i].imagePrompt;
-    try {
-      scenes[i].videoStatus = "generating";
-      const videoId = await startVideoGeneration(videoPrompt, videoModel);
-      videoJobs.push({ index: i, videoId });
-      const trackingKey = `${sermonId}-${i}`;
-      videoGenerationJobs.set(trackingKey, { videoId, status: "generating", url: null });
-    } catch (err) {
-      console.error(`Video gen start failed for scene ${i}:`, err);
-      scenes[i].videoStatus = "failed";
-    }
-  }
-
-  // Step 5: Generate quizzes and discussion prompts (while videos generate in parallel)
-  updateProgress("Creating quizzes and discussion prompts...", 68);
+  updateProgress("Creating quizzes and discussion prompts...", 80);
   for (let i = 0; i < scenes.length; i++) {
     const quiz = await generateQuiz(scenes[i].content, "mixed");
     scenes[i].quiz = quiz;
@@ -525,73 +232,6 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     scenes[i].discussionPrompts = discussion;
   }
 
-  // Step 6: Wait for ALL videos to finish generating and download them
-  updateProgress("Generating animated videos... This takes a few minutes.", 72);
-  if (videoJobs.length > 0) {
-    const totalVideos = videoJobs.length;
-    let completedVideos = 0;
-
-    await Promise.all(videoJobs.map(async ({ index, videoId }) => {
-      try {
-        let attempts = 0;
-        const maxAttempts = 90;
-        let lastProgress = -1;
-        let stallCount = 0;
-        const maxStallCount = 12;
-        while (attempts < maxAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, 10000));
-          attempts++;
-
-          const result = await checkVideoStatus(videoId);
-          const progressPct = result.progress || 0;
-          console.log(`Video ${sermonId}-${index}: ${progressPct}% complete`);
-
-          if (progressPct === lastProgress) {
-            stallCount++;
-            if (stallCount >= maxStallCount) {
-              scenes[index].videoStatus = "failed";
-              completedVideos++;
-              console.error(`Video stalled at ${progressPct}% for ${sermonId}-${index} (no progress for ${maxStallCount * 10}s)`);
-              return;
-            }
-          } else {
-            stallCount = 0;
-            lastProgress = progressPct;
-          }
-
-          if (result.status === "ready") {
-            const localPath = await downloadVideoContent(videoId, `${sermonId}-scene${index}.mp4`);
-            scenes[index].videoUrl = localPath;
-            scenes[index].videoStatus = "ready";
-            const trackingKey = `${sermonId}-${index}`;
-            const job = videoGenerationJobs.get(trackingKey);
-            if (job) { job.status = "ready"; job.url = localPath; }
-            completedVideos++;
-            const videoProg = 72 + Math.round((completedVideos / totalVideos) * 23);
-            updateProgress(`Videos ready: ${completedVideos} of ${totalVideos}`, videoProg);
-            console.log(`Video ready for ${sermonId}-${index}: ${localPath}`);
-            return;
-          }
-
-          if (result.status === "failed") {
-            scenes[index].videoStatus = "failed";
-            completedVideos++;
-            console.error(`Video generation failed for ${sermonId}-${index}`);
-            return;
-          }
-        }
-        scenes[index].videoStatus = "failed";
-        completedVideos++;
-        console.error(`Video generation timed out for ${sermonId}-${index}`);
-      } catch (err) {
-        console.error(`Video error for ${sermonId}-${index}:`, err);
-        scenes[index].videoStatus = "failed";
-        completedVideos++;
-      }
-    }));
-  }
-
-  // Step 7: Final assembly — all videos are downloaded
   updateProgress("Assembling experience...", 98);
   sermon.status = "ready";
   sermon.progress = 100;
@@ -633,8 +273,7 @@ async function generateScenes(text: string, analysis: any) {
 CRITICAL STYLE AND CONTENT RULES:
 - All visuals must be in a colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
 - NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
-- Characters must NEVER have mouth movements, speaking gestures, or dialog. No characters should appear to be talking. Show characters listening, thinking, walking, looking, gesturing — but never speaking.
-- No background music, sound effects, or dialog should be described in video prompts. The videos are silent visual animations only.
+- Characters must NEVER have open mouths or appear to be speaking.
 
 For each scene, provide:
 - title: A short, engaging scene title
@@ -642,8 +281,7 @@ For each scene, provide:
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed DALL-E prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting, biblical setting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking.
-- videoPrompt: A detailed prompt for an 8-second colorful cinematic 3D animated video of this scene, in the style of a modern family animated feature film with expressive big-eyed characters and soft global lighting. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Warm cinematic lighting and rich colors. No copyrighted characters or recognizable brands. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
+- imagePrompt: A detailed image generation prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting, biblical setting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text or words in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking. The image should be widescreen (16:9 aspect ratio) with rich detail and depth.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -674,7 +312,7 @@ ${text.substring(0, 12000)}`,
           role: "system",
           content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
-CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No mouth movements or speaking gestures. No background music or dialog in video prompts.
+CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
 
 For each scene, provide:
 - title: A short, engaging scene title
@@ -682,8 +320,7 @@ For each scene, provide:
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A DALL-E prompt for a colorful cinematic 3D animated style with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting, biblical setting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths.
-- videoPrompt: A prompt for an 8-second colorful cinematic 3D animated video in the style of a modern family animated feature film. Gentle motion: characters walking, reacting, light shifting, camera panning. No copyrighted characters or recognizable brands. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
+- imagePrompt: A prompt for a colorful cinematic 3D animated style illustration with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting, biblical setting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths. Widescreen 16:9 with rich detail.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -741,15 +378,60 @@ Scripture: ${scene.scriptureRef || "none"}`,
   return JSON.parse(response.choices[0].message.content || "{}");
 }
 
-async function generateImage(prompt: string): Promise<string> {
-  const response = await openai.images.generate({
-    model: "dall-e-3",
-    prompt: prompt,
-    n: 1,
-    size: "1792x1024",
-    quality: "standard",
-  });
-  return response.data?.[0]?.url || "";
+// ============================================
+// IMAGE GENERATION (Google Gemini Imagen 3)
+// ============================================
+
+async function generateImage(prompt: string, sermonId?: string, sceneIndex?: number): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is required for image generation");
+
+  console.log(`Generating image with Imagen 3 for ${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`);
+
+  const body = {
+    instances: [{ prompt }],
+    parameters: {
+      aspectRatio: "16:9",
+      numberOfImages: 1,
+    },
+  };
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Imagen 3 API error:", response.status, errorText);
+    throw new Error(`Imagen 3 API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json() as any;
+
+  if (!result.predictions || result.predictions.length === 0) {
+    throw new Error("Imagen 3 returned no images");
+  }
+
+  const prediction = result.predictions[0];
+  const imageData = prediction.bytesBase64Encoded;
+  const mimeType = prediction.mimeType || "image/png";
+  const ext = mimeType === "image/jpeg" ? ".jpg" : ".png";
+
+  const filename = sermonId && sceneIndex !== undefined
+    ? `${sermonId}-scene${sceneIndex}${ext}`
+    : `image-${Date.now()}${ext}`;
+
+  const filePath = path.join(IMAGES_DIR, filename);
+  const buffer = Buffer.from(imageData, "base64");
+  fs.writeFileSync(filePath, buffer);
+  console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
+
+  return `/generated/images/${filename}`;
 }
 
 async function generateQuiz(content: string, ageGroup: string) {
@@ -821,6 +503,3 @@ Create 2-3 prompts per scene. Make them practical, warm, and accessible to paren
   });
   return JSON.parse(response.choices[0].message.content || '{"prompts":[]}');
 }
-
-// Need to import express for the static middleware
-import express from "express";
