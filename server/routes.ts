@@ -534,7 +534,10 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
     await Promise.all(videoJobs.map(async ({ index, videoId }) => {
       try {
         let attempts = 0;
-        const maxAttempts = 120;
+        const maxAttempts = 90;
+        let lastProgress = -1;
+        let stallCount = 0;
+        const maxStallCount = 12;
         while (attempts < maxAttempts) {
           await new Promise((resolve) => setTimeout(resolve, 10000));
           attempts++;
@@ -542,6 +545,19 @@ async function processSermon(sermonId: string, text: string, videoModel?: string
           const result = await checkVideoStatus(videoId);
           const progressPct = result.progress || 0;
           console.log(`Video ${sermonId}-${index}: ${progressPct}% complete`);
+
+          if (progressPct === lastProgress) {
+            stallCount++;
+            if (stallCount >= maxStallCount) {
+              scenes[index].videoStatus = "failed";
+              completedVideos++;
+              console.error(`Video stalled at ${progressPct}% for ${sermonId}-${index} (no progress for ${maxStallCount * 10}s)`);
+              return;
+            }
+          } else {
+            stallCount = 0;
+            lastProgress = progressPct;
+          }
 
           if (result.status === "ready") {
             const localPath = await downloadVideoContent(videoId, `${sermonId}-scene${index}.mp4`);
