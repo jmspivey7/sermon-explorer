@@ -215,6 +215,9 @@ async function processSermon(sermonId: string, text: string) {
       console.error(`Image gen failed for scene ${i}:`, err);
       scenes[i].imageUrl = null;
     }
+    if (i < scenes.length - 1) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
   }
 
   updateProgress("Creating quizzes and discussion prompts...", 80);
@@ -378,38 +381,93 @@ Scripture: ${scene.scriptureRef || "none"}`,
 }
 
 async function generateImage(prompt: string, sermonId?: string, sceneIndex?: number): Promise<string> {
+  const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
+
+  try {
+    return await generateImageGemini(prompt, label, sermonId, sceneIndex);
+  } catch (err: any) {
+    console.warn(`Gemini Imagen failed for ${label}: ${err.message?.substring(0, 120)}`);
+    console.log(`Falling back to DALL-E 3 for ${label}`);
+    return await generateImageDallE(prompt, label, sermonId, sceneIndex);
+  }
+}
+
+async function generateImageGemini(prompt: string, label: string, sermonId?: string, sceneIndex?: number): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is required for image generation");
+  if (!apiKey) throw new Error("GEMINI_API_KEY not set");
 
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
-  console.log(`Generating image with Imagen 4 for ${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`);
+  console.log(`Generating image with Imagen 4 for ${label}`);
 
-  const response = await client.models.generateImages({
-    model: "imagen-4.0-generate-001",
+  const maxRetries = 3;
+  let lastError: any;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = Math.min(5000 * Math.pow(2, attempt - 1), 30000);
+        console.log(`Retry ${attempt}/${maxRetries} for ${label}, waiting ${delay / 1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      const response = await client.models.generateImages({
+        model: "imagen-4.0-generate-001",
+        prompt,
+        config: {
+          numberOfImages: 1,
+          aspectRatio: "16:9",
+        },
+      });
+
+      if (!response.generatedImages || response.generatedImages.length === 0) {
+        throw new Error("Imagen returned no images");
+      }
+
+      const imageBytes = response.generatedImages[0].image?.imageBytes;
+      if (!imageBytes) {
+        throw new Error("Imagen returned empty image data");
+      }
+
+      return saveImageFile(Buffer.from(imageBytes, "base64"), sermonId, sceneIndex);
+    } catch (err: any) {
+      lastError = err;
+      if (err.status === 429) continue;
+      throw err;
+    }
+  }
+
+  throw lastError;
+}
+
+async function generateImageDallE(prompt: string, label: string, sermonId?: string, sceneIndex?: number): Promise<string> {
+  console.log(`Generating image with DALL-E 3 for ${label}`);
+
+  const response = await openai.images.generate({
+    model: "dall-e-3",
     prompt,
-    config: {
-      numberOfImages: 1,
-      aspectRatio: "16:9",
-    },
+    n: 1,
+    size: "1792x1024",
+    quality: "standard",
   });
 
-  if (!response.generatedImages || response.generatedImages.length === 0) {
-    throw new Error("Imagen returned no images");
-  }
+  const imageUrl = response.data?.[0]?.url;
+  if (!imageUrl) throw new Error("DALL-E 3 returned no image URL");
 
-  const imageBytes = response.generatedImages[0].image?.imageBytes;
-  if (!imageBytes) {
-    throw new Error("Imagen returned empty image data");
-  }
+  const imageResponse = await fetch(imageUrl);
+  if (!imageResponse.ok) throw new Error(`Failed to download DALL-E image: ${imageResponse.status}`);
+  const buffer = Buffer.from(await imageResponse.arrayBuffer());
 
+  return saveImageFile(buffer, sermonId, sceneIndex);
+}
+
+function saveImageFile(buffer: Buffer, sermonId?: string, sceneIndex?: number): string {
   const filename = sermonId && sceneIndex !== undefined
     ? `${sermonId}-scene${sceneIndex}.png`
     : `image-${Date.now()}.png`;
 
   const filePath = path.join(IMAGES_DIR, filename);
-  const buffer = Buffer.from(imageBytes, "base64");
   fs.writeFileSync(filePath, buffer);
   console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
 
