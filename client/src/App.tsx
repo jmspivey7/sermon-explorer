@@ -6,6 +6,8 @@ import Sermons from "./pages/sermons";
 import Viewer from "./pages/viewer";
 import Upload from "./pages/upload";
 import Admin from "./pages/admin";
+import AdminSermons from "./pages/admin-sermons";
+import AdminWorship from "./pages/admin-worship";
 import Worship from "./pages/worship";
 
 function Router() {
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/view/:sermonId" component={Viewer} />
       <Route path="/upload" component={Upload} />
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/sermons" component={AdminSermons} />
+      <Route path="/admin/worship" component={AdminWorship} />
       <Route path="/worship" component={Worship} />
       <Route>
         <div className="flex items-center justify-center min-h-screen bg-se-navy">

@@ -65,7 +65,7 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100">
-        <button onClick={() => setLocation("/admin")} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+        <button onClick={() => setLocation("/admin/sermons")} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
         <h1 className="font-display font-bold text-gray-800 text-lg">Upload Sermon</h1>
