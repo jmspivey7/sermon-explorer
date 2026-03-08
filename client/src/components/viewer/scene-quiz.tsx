@@ -25,18 +25,16 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
 
   if (questions.length === 0) {
     return (
-      <div className="px-5 py-10 text-center pb-24">
+      <div className="px-5 py-10 text-center">
         <p className="text-gray-500 font-display mb-4">No quiz for this scene</p>
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
-          <button
-            onClick={onSkip}
-            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
-          >
-            <span className="font-display font-bold text-white text-sm">Continue</span>
-            <ChevronRight className="w-4 h-4 text-white" />
-          </button>
-        </div>
+        <button
+          onClick={onSkip}
+          className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                     hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
+        >
+          <span className="font-display font-bold text-white text-sm">Continue</span>
+          <ChevronRight className="w-4 h-4 text-white" />
+        </button>
       </div>
     );
   }
@@ -71,7 +69,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
   const optionLetters = ["A", "B", "C", "D"];
 
   return (
-    <div className="px-5 py-6 pb-28">
+    <div className="px-5 py-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-se-green" />
@@ -102,7 +100,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           {q.question}
         </p>
 
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-4">
           {q.options.map((option: string, idx: number) => {
             let bg = "bg-gray-50 border-gray-200";
             let textColor = "text-gray-700";
@@ -149,7 +147,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-4"
           >
             <div className={`rounded-2xl p-4 border ${
               isCorrect
@@ -175,9 +173,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             </div>
           </motion.div>
         )}
-      </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
         {showResult ? (
           <motion.button
             initial={{ opacity: 0, y: 10 }}
@@ -185,7 +181,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             whileTap={{ scale: 0.98 }}
             onClick={handleNext}
             className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
+                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20 mb-2"
           >
             <span className="font-display font-bold text-white text-sm">
               {isLast ? "See Discussion" : "Next Question"}
@@ -197,12 +193,12 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             onClick={onSkip}
             className="w-full py-2 text-center"
           >
-            <span className="font-display text-xs text-gray-300 hover:text-gray-500 transition-colors">
+            <span className="font-display text-xs text-gray-400 hover:text-gray-600 transition-colors">
               Skip quiz
             </span>
           </button>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

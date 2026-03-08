@@ -20,25 +20,23 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
 
   if (prompts.length === 0) {
     return (
-      <div className="px-5 py-10 text-center pb-24">
+      <div className="px-5 py-10 text-center">
         <p className="text-gray-500 font-display mb-4">No discussion prompts for this scene</p>
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={onComplete}
-            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
-          >
-            <span className="font-display font-bold text-white text-sm">Continue</span>
-            <ChevronRight className="w-4 h-4 text-white" />
-          </motion.button>
-        </div>
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={onComplete}
+          className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                     hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
+        >
+          <span className="font-display font-bold text-white text-sm">Continue</span>
+          <ChevronRight className="w-4 h-4 text-white" />
+        </motion.button>
       </div>
     );
   }
 
   return (
-    <div className="px-5 py-6 pb-28">
+    <div className="px-5 py-6">
       <div className="text-center mb-6">
         <div className="w-16 h-16 rounded-full bg-se-purple/10 flex items-center justify-center mx-auto mb-3">
           <Users className="w-8 h-8 text-se-purple" />
@@ -102,26 +100,24 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         </motion.button>
       )}
 
-      <div className="bg-se-blue/5 border border-se-blue/15 rounded-2xl p-4 mb-6">
+      <div className="bg-se-blue/5 border border-se-blue/15 rounded-2xl p-4 mb-4">
         <p className="text-gray-500 font-story text-sm leading-relaxed text-center">
           Take your time with these questions. There are no wrong answers — the goal
           is to listen, share, and grow together.
         </p>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={onComplete}
-          className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                     hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
-        >
-          <span className="font-display font-bold text-white text-sm">
-            {isLastScene ? "See Your Results" : "Next Scene"}
-          </span>
-          <ChevronRight className="w-4 h-4 text-white" />
-        </motion.button>
-      </div>
+      <motion.button
+        whileTap={{ scale: 0.98 }}
+        onClick={onComplete}
+        className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                   hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
+      >
+        <span className="font-display font-bold text-white text-sm">
+          {isLastScene ? "See Your Results" : "Next Scene"}
+        </span>
+        <ChevronRight className="w-4 h-4 text-white" />
+      </motion.button>
     </div>
   );
 }

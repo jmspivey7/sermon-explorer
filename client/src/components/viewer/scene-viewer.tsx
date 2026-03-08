@@ -48,7 +48,6 @@ const EMOTION_ICONS: Record<string, string> = {
 export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, userName, sermonId, onComplete, onSkip }: Props) {
   const [narrationDone, setNarrationDone] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const [showButtons, setShowButtons] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [narrationStarted, setNarrationStarted] = useState(false);
 
@@ -98,7 +97,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     narrationAbortRef.current = false;
     setNarrationDone(false);
     setShowContent(false);
-    setShowButtons(false);
     setNarrationStarted(false);
 
     const contentTimer = setTimeout(() => setShowContent(true), 500);
@@ -116,11 +114,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     };
   }, [sceneIndex]);
 
-  useEffect(() => {
-    if (narrationDone) {
-      setShowButtons(true);
-    }
-  }, [narrationDone]);
 
   function toggleMute() {
     setIsMuted((m) => {
@@ -213,40 +206,22 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
         </AnimatePresence>
       </div>
 
-      <AnimatePresence>
-        {showButtons && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
+        {narrationDone ? (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent"
+            whileTap={{ scale: 0.98 }}
+            onClick={onComplete}
+            className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
+                       hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              onClick={onComplete}
-              className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                         hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
-            >
-              <span className="font-display font-bold text-white text-sm">
-                {isLast ? "Finish Story" : "Next Scene"}
-              </span>
-              <ChevronRight className="w-4 h-4 text-white" />
-            </motion.button>
-
-            <button
-              onClick={onSkip}
-              className="w-full mt-2 py-2 text-center"
-            >
-              <span className="font-display text-xs text-gray-300 hover:text-gray-500 transition-colors">
-                Skip to next
-              </span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!showButtons && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-4">
+            <span className="font-display font-bold text-white text-sm">
+              {isLast ? "Finish Story" : "Next Scene"}
+            </span>
+            <ChevronRight className="w-4 h-4 text-white" />
+          </motion.button>
+        ) : (
           <div className="flex items-center justify-center gap-2 py-3">
             <div className="flex gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -257,8 +232,17 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               Listening...
             </span>
           </div>
-        </div>
-      )}
+        )}
+
+        <button
+          onClick={onSkip}
+          className="w-full mt-2 py-2 text-center"
+        >
+          <span className="font-display text-xs text-gray-400 hover:text-gray-600 transition-colors">
+            Skip to next
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
