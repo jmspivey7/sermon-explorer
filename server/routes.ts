@@ -201,7 +201,7 @@ async function processSermon(sermonId: string, text: string) {
   updateProgress("Writing age-appropriate narratives...", 35);
   for (let i = 0; i < scenes.length; i++) {
     updateProgress(`Writing narratives for scene ${i + 1}/${scenes.length}...`, 35 + (i / scenes.length) * 15);
-    const narratives = await generateNarratives(scenes[i]);
+    const narratives = await generateNarratives(scenes[i], i, scenes.length);
     scenes[i].narratives = narratives;
   }
 
@@ -267,36 +267,49 @@ async function generateScenes(text: string, analysis: any) {
     messages: [
       {
         role: "system",
-        content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes that follow the sermon IN THE EXACT ORDER it was preached.
+        content: `You are a creative director turning a sermon into a cohesive illustrated storybook that reads as ONE CONTINUOUS STORY from beginning to end. Break the sermon into 8-10 visual scenes.
 
-SERMON ORDER RULE (MOST IMPORTANT):
-- Scenes MUST follow the sermon's actual sequence from beginning to end. Scene 1 covers the opening of the sermon, scene 2 covers what comes next, and so on through to the conclusion.
-- Do NOT rearrange, regroup, or reorder the sermon's content for dramatic effect. The storybook should walk the reader through the sermon in the same order the pastor delivered it.
-- Each scene should correspond to the next sequential section of the sermon text. If the pastor started with a story, then moved to a scripture, then gave an illustration, the scenes should follow that same progression.
+RULE 1 — SERMON ORDER (MOST IMPORTANT):
+- Scenes MUST follow the sermon's actual sequence from beginning to end. Scene 1 covers the opening, scene 2 what comes next, and so on through to the conclusion.
+- Do NOT rearrange, regroup, or reorder the sermon's content. Follow the exact order the pastor delivered it.
 
-CRITICAL STYLE AND CONTENT RULES:
-- All visuals must be in a colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
-- NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
+RULE 2 — CONTINUOUS NARRATIVE FLOW:
+- The storybook must read as one flowing story, NOT as disconnected snapshots. Each scene should build on the previous one.
+- Scene content should use transitional language that connects to what came before: "As we continue...", "Next, we learn...", "Building on that idea...", "The story then takes us to...", etc.
+- NEVER restart or re-introduce the topic as if starting over. If scene 3 covered a concept, scene 4 should move FORWARD, not circle back.
+- Each scene must advance the story. The reader should feel momentum carrying them through the sermon.
+
+RULE 3 — NO DUPLICATE OR REPETITIVE SCENES:
+- Every scene must cover DISTINCT content from the sermon. No two scenes should teach the same concept, lesson, or idea.
+- If the pastor repeated a theme for emphasis, consolidate it into ONE scene. Do not create separate scenes for variations of the same point.
+- Before finalizing, review all scenes together and merge or replace any that overlap significantly.
+
+RULE 4 — IMAGE PROMPT RULES:
+- Style: Colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, like a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
+- NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Use symbolic imagery: warm golden light, glowing clouds, radiant sunrise, guiding star, comforting glow.
 - Characters must NEVER have open mouths or appear to be speaking.
+- ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, LABELS, CAPTIONS, NAMES, OR WRITING OF ANY KIND in the image. Do not include character names, signs, banners, scrolls with writing, books with visible text, or any readable content. The image must be purely visual with zero text elements.
+- Each scene's image must visually connect to the sermon content and feel consistent with the other scenes' art style and setting.
 
-CONTENT SAFETY RULES (MANDATORY):
-- NEVER include alcohol, beer, wine, liquor, bottles of alcohol, bars, pubs, taverns, or any drinking establishments in image prompts. Even if the sermon references such topics, the image must depict a wholesome, child-appropriate alternative setting.
-- NEVER include drugs, drug paraphernalia, smoking, cigarettes, vaping, or any substance use imagery.
-- NEVER include weapons, violence, blood, or frightening imagery.
-- NEVER include gambling imagery (slot machines, poker, etc.).
-- All scenes must be suitable for children ages 4-12. When a sermon discusses adult topics (addiction, temptation, worldly distractions), illustrate them through safe metaphors: a child at a crossroads, a stormy sea becoming calm, a dimly lit path vs. a bright path, etc.
+RULE 5 — CONTENT SAFETY (MANDATORY — ZERO TOLERANCE):
+- ABSOLUTELY NO alcohol, beer, wine, liquor, bottles, glasses of alcohol, bars, pubs, taverns, drinking establishments, cocktails, or any beverage that could be interpreted as alcoholic.
+- ABSOLUTELY NO drugs, drug paraphernalia, smoking, cigarettes, vaping, pills, syringes, or substance use.
+- ABSOLUTELY NO gambling: no poker chips, playing cards used for gambling, slot machines, dice games, casino imagery, or betting.
+- ABSOLUTELY NO weapons, violence, blood, gore, or frightening imagery.
+- Even if the sermon DIRECTLY discusses alcohol, gambling, addiction, or sin — the image prompt must NEVER depict these literally. Instead use child-safe metaphors: a child choosing between two paths (bright vs. dark), a stormy sea becoming calm, a wilting flower being restored, a lost sheep being found, etc.
+- All imagery must be appropriate for children ages 4-12.
 
-REAL-WORLD ILLUSTRATION RULE:
-- If the pastor used a memorable real-world example, analogy, or personal story in the sermon (e.g., jumping off a high dive to illustrate overcoming fear, or a child sharing a lunchbox to illustrate generosity), then 1-2 of the scenes (roughly 10-20% of total scenes) should have their imagePrompt depict that real-world illustration in a modern-day setting rather than a biblical setting. These scenes should still use the same colorful cinematic 3D animated style, but show the modern scenario the pastor described (a swimming pool, a school cafeteria, etc.).
-- If the sermon does NOT contain any real-world examples or personal stories, then ALL imagePrompts should use biblical settings as usual. Do not force modern-day scenes if none exist in the sermon.
+RULE 6 — REAL-WORLD ILLUSTRATIONS:
+- If the pastor used a memorable real-world example or personal story, 1-2 scenes (10-20%) should depict that modern-day scenario. These must still follow all safety rules above.
+- If no real-world examples exist in the sermon, use biblical settings for all scenes.
 
 For each scene, provide:
 - title: A short, engaging scene title
-- content: The core teaching content of this scene (2-3 paragraphs from the sermon)
-- scriptureRef: Any Bible verse referenced in this section
-- keyPoint: The single most important idea in this scene
+- content: The core teaching content (2-3 paragraphs). Must use transitional language connecting to the previous scene.
+- scriptureRef: Any Bible verse referenced
+- keyPoint: The single most important idea
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed image generation prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text or words in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking. The image should be widescreen (16:9 aspect ratio) with rich detail and depth. For scenes based on the pastor's real-world illustrations, use a modern-day setting that matches the story described. For all other scenes, use a biblical setting.
+- imagePrompt: A detailed prompt following ALL image rules above. Must specify: colorful cinematic 3D animated style, expressive big-eyed characters, soft global lighting, warm cinematic lighting, widescreen 16:9, rich detail. Must explicitly state "no text, no words, no letters, no writing of any kind in the image." Must explicitly state "no alcohol, no gambling, no drugs, no weapons."
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -325,19 +338,20 @@ ${text.substring(0, 12000)}`,
       messages: [
         {
           role: "system",
-          content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes that follow the sermon IN THE EXACT ORDER it was preached.
+          content: `You are a creative director turning a sermon into a cohesive illustrated storybook. Break the sermon into 5-6 visual scenes that read as ONE CONTINUOUS STORY following the sermon's exact order.
 
-SERMON ORDER RULE (MOST IMPORTANT): Scenes MUST follow the sermon's actual sequence from beginning to end. Do NOT rearrange or reorder content. Each scene should correspond to the next sequential section of the sermon.
-
-CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
-
-CONTENT SAFETY (MANDATORY): NEVER include alcohol, bars, pubs, drugs, smoking, weapons, violence, blood, gambling in image prompts. All scenes must be child-safe (ages 4-12). For adult topics, use safe metaphors: a crossroads, a stormy sea calming, a dim path vs. bright path.
-
-REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples or personal stories, 1-2 scenes (10-20%) should depict those modern-day illustrations instead of biblical settings. If no real-world examples exist, use biblical settings for all scenes.
+RULES:
+1. SERMON ORDER: Follow the exact sequence the sermon was preached. No rearranging.
+2. CONTINUOUS FLOW: Each scene builds on the previous one with transitional language. Never restart or re-introduce topics.
+3. NO DUPLICATES: Every scene must cover distinct content. No two scenes should teach the same concept.
+4. IMAGE SAFETY (ZERO TOLERANCE): ABSOLUTELY NO alcohol, beer, wine, liquor, bars, pubs, drugs, smoking, gambling, poker chips, weapons, violence in image prompts. For adult sermon topics, use child-safe metaphors (a bright path vs. dark path, a calm sea after a storm, etc.).
+5. NO TEXT IN IMAGES: ABSOLUTELY NO text, words, letters, numbers, names, labels, signs, banners, or writing of any kind in image prompts. Images must be purely visual.
+6. STYLE: Colorful cinematic 3D animated style, like a modern family animated feature film (NOT realistic). No copyrighted characters. NEVER depict God/Jesus/Holy Spirit — use symbolic light/warmth. No open mouths on characters.
+7. REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples, 1-2 scenes may depict those in modern-day settings (following all safety rules). Otherwise use biblical settings.
 
 For each scene, provide:
 - title: A short, engaging scene title
-- content: The core teaching content of this scene (1-2 paragraphs from the sermon)
+- content: The core teaching content of this scene (1-2 paragraphs). Must use transitions connecting to previous scene.
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
@@ -369,13 +383,19 @@ ${text.substring(0, 8000)}`,
   return parsed.scenes || [];
 }
 
-async function generateNarratives(scene: any) {
+async function generateNarratives(scene: any, sceneIndex: number = 0, totalScenes: number = 1) {
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
       {
         role: "system",
-        content: `You create age-appropriate retellings of sermon scenes. The scene content you receive follows the actual order of the sermon as it was preached. Your narration should preserve this order and context — walk the reader through what the pastor taught in the sequence it was delivered.
+        content: `You create age-appropriate retellings of sermon scenes that flow as part of ONE CONTINUOUS STORY. This scene is part of a larger storybook — your narration should feel like the next chapter, not a fresh start.
+
+CRITICAL FLOW RULES:
+- Write as if continuing an ongoing story. Use language that builds on what came before.
+- NEVER re-introduce the topic or start from scratch. Assume the reader has already read the previous scenes.
+- Use transitional phrasing where appropriate: "As the story continues...", "Next...", "Then...", "Building on what we just learned...", etc.
+- The narration should feel like turning the page of a storybook, not starting a new book.
 
 For each scene, write THREE versions:
 
@@ -389,7 +409,8 @@ Respond with JSON: { "young": "...", "older": "...", "family": "..." }`,
       },
       {
         role: "user",
-        content: `Scene: ${scene.title}
+        content: `Scene ${sceneIndex + 1} of ${totalScenes}: ${scene.title}
+${sceneIndex === 0 ? "(This is the OPENING scene — introduce the story.)" : `(This is scene ${sceneIndex + 1} — continue the story from the previous scene. Do NOT re-introduce or start over.)`}
 Key Point: ${scene.keyPoint}
 Content: ${scene.content}
 Scripture: ${scene.scriptureRef || "none"}`,
@@ -408,7 +429,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
-  const safetyPrefix = "IMPORTANT: This image is for a children's storybook (ages 4-12). Do NOT include any alcohol, beer, wine, liquor, bars, pubs, drugs, smoking, weapons, violence, blood, gambling, or any adult/inappropriate content. All settings must be wholesome and child-safe. ";
+  const safetyPrefix = "STRICT RULES FOR THIS IMAGE — ZERO TOLERANCE: This image is for a children's storybook (ages 4-12). 1) ABSOLUTELY NO text, words, letters, numbers, names, labels, signs, writing, or readable content of ANY kind anywhere in the image. 2) ABSOLUTELY NO alcohol, beer, wine, liquor, bottles, glasses, bars, pubs, taverns, cocktails. 3) ABSOLUTELY NO gambling, poker chips, playing cards, dice, casinos, slot machines. 4) ABSOLUTELY NO drugs, smoking, cigarettes, pills, syringes. 5) ABSOLUTELY NO weapons, violence, blood, gore. 6) All settings must be wholesome, bright, and child-safe. ";
   const safePrompt = safetyPrefix + prompt;
 
   const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
