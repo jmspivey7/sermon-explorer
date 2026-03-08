@@ -643,7 +643,7 @@ For each scene, provide:
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
 - imagePrompt: A detailed DALL-E prompt for a Pixar/Disney 3D animated style illustration. Colorful, stylized characters with expressive faces, smooth 3D rendering, warm cinematic lighting, biblical setting. Suitable for children ages 4-12. Never include text in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking.
-- videoPrompt: A detailed prompt for a 12-second Pixar-style 3D animated video of this scene. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Pixar/Disney 3D animation style with warm cinematic lighting and rich colors. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
+- videoPrompt: A detailed prompt for an 8-second Pixar-style 3D animated video of this scene. Describe gentle motion and action: characters walking, looking around, reacting emotionally, wind blowing through hair/clothes, light shifting, camera panning slowly. Pixar/Disney 3D animation style with warm cinematic lighting and rich colors. NO mouth movements or speaking gestures. NO background music or dialog. Never show God or Jesus — use symbolic golden light, glowing atmosphere, or radiant warmth. Keep motion gentle and calming, suitable for children. Never include text or words.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -683,7 +683,7 @@ For each scene, provide:
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
 - imagePrompt: A DALL-E prompt for Pixar/Disney 3D animated style. Colorful, stylized characters, smooth 3D rendering, warm cinematic lighting, biblical setting. No text. Never depict God or Jesus — use symbolic light. No open mouths.
-- videoPrompt: A prompt for a 12-second Pixar-style 3D animated video. Gentle motion: characters walking, reacting, light shifting, camera panning. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
+- videoPrompt: A prompt for an 8-second Pixar-style 3D animated video. Gentle motion: characters walking, reacting, light shifting, camera panning. NO mouth movements, NO dialog, NO music. Never show God or Jesus — use golden light. No text.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
