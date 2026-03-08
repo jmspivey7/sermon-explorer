@@ -19,7 +19,7 @@ export default {
         sans: ['"Source Sans 3"', "system-ui", "sans-serif"],
         display: ['"Source Sans 3"', "system-ui", "sans-serif"],
         story: ['"Source Sans 3"', "Georgia", "serif"],
-        accent: ["Devonshire", "cursive"],
+        accent: ["Yellowtail", "cursive"],
       },
     },
   },
