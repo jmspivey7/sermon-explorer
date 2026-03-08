@@ -757,7 +757,14 @@ Respond with JSON:
   ]
 }
 
-Create 2 questions for each age group (6 total). Young questions should be very simple true/false or picture-based. Older questions multiple choice. Family questions can be deeper.`,
+Create 2 questions for each age group (6 total).
+
+IMPORTANT RULES:
+- "young" questions (ages 4-6): Use simple Yes/No format with options ["Yes", "No"]. Frame the question so "Yes" or "No" is the answer. NEVER use "True/False". Keep language very simple.
+- "older" questions (ages 7-10): Multiple choice with 3 text options. Questions should be straightforward and age-appropriate.
+- "family" questions (ages 11+): Multiple choice with 3 text options. Can be deeper and more reflective.
+- ALL questions must be answerable from the narration text alone. NEVER ask the user to identify, compare, or choose between images, pictures, illustrations, or visual elements. The quiz is text-only — the user cannot see any images while answering.
+- NEVER reference "which picture" or "which image" or ask users to compare visual options.`,
       },
       { role: "user", content: content },
     ],

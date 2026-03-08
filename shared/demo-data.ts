@@ -27,8 +27,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "Why did Jesus go to the Pharisee's house?", options: ["He was hungry", "He cared about everyone", "He was lost"], correctIndex: 1, explanation: "Jesus went because he cares about all people, even those who don't understand him!", ageGroup: "young" },
-          { question: "Was the Pharisee's invitation friendly?", options: ["Yes, they were best friends", "No, they wanted to watch Jesus", "They didn't care"], correctIndex: 1, explanation: "The Pharisees wanted to watch Jesus closely and find something wrong with him.", ageGroup: "young" },
+          { question: "Did Jesus go to the dinner because he cared about everyone?", options: ["Yes", "No"], correctIndex: 0, explanation: "Jesus went because he cares about all people, even those who don't understand him!", ageGroup: "young" },
+          { question: "Was the Pharisee's invitation a friendly one?", options: ["Yes", "No"], correctIndex: 1, explanation: "The Pharisees wanted to watch Jesus closely and find something wrong with him.", ageGroup: "young" },
           { question: "What were the Pharisees known for?", options: ["Breaking all the rules", "Following religious rules very carefully", "Being farmers"], correctIndex: 1, explanation: "Pharisees were religious leaders who followed every rule very carefully.", ageGroup: "older" },
           { question: "What does it say about Jesus that he went to dinner with people who didn't like him?", options: ["He didn't know they were against him", "He wanted to argue", "He wanted to reach everyone with his message"], correctIndex: 2, explanation: "Jesus showed courage and love by going to people who opposed him.", ageGroup: "older" },
           { question: "What does Jesus' willingness to dine with his opponents teach us about approaching difficult relationships?", options: ["Avoid people who disagree with you", "Show up with courage and love, even when it's uncomfortable", "Only spend time with friends"], correctIndex: 1, explanation: "Jesus models that we can engage with difficult people while maintaining our integrity and love.", ageGroup: "family" },
@@ -57,8 +57,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "Did Jesus forget to wash his hands?", options: ["Yes, he forgot", "No, he did it on purpose", "He doesn't have hands"], correctIndex: 1, explanation: "Jesus skipped it on purpose to teach an important lesson!", ageGroup: "young" },
-          { question: "What matters more to God?", options: ["How clean your hands are", "What's in your heart", "What clothes you wear"], correctIndex: 1, explanation: "God cares most about what's inside us, our heart!", ageGroup: "young" },
+          { question: "Did Jesus skip the hand washing on purpose?", options: ["Yes", "No"], correctIndex: 0, explanation: "Jesus skipped it on purpose to teach an important lesson!", ageGroup: "young" },
+          { question: "Does God care most about what's in your heart?", options: ["Yes", "No"], correctIndex: 0, explanation: "God cares most about what's inside us, our heart!", ageGroup: "young" },
           { question: "Why were the Pharisees shocked?", options: ["Jesus broke a religious tradition", "Jesus spilled his drink", "Jesus was late"], correctIndex: 0, explanation: "Jesus didn't follow their extra rules, and they couldn't believe it.", ageGroup: "older" },
           { question: "What's the difference between God's commands and the Pharisees' extra rules?", options: ["There's no difference", "God's commands come from love; the extra rules were about control", "The extra rules were better"], correctIndex: 1, explanation: "God's real rules are about love. The Pharisees added rules to show off and control others.", ageGroup: "older" },
           { question: "What 'extra rules' might we follow today that aren't actually from God?", options: ["All church traditions are wrong", "Sometimes we confuse cultural expectations with God's commands", "Rules don't matter at all"], correctIndex: 1, explanation: "It's worth examining whether our religious habits are truly from God or just comfortable traditions.", ageGroup: "family" },
@@ -87,8 +87,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "What did Jesus compare the Pharisees to?", options: ["A dirty cup", "A shiny cup that's dirty inside", "A broken plate"], correctIndex: 1, explanation: "Jesus said they were like a cup that looks clean outside but is dirty inside!", ageGroup: "young" },
-          { question: "Does God only see the outside of us?", options: ["Yes, just what we show", "No, God sees our hearts too", "God doesn't look at us"], correctIndex: 1, explanation: "God sees everything about us, including what's in our hearts!", ageGroup: "young" },
+          { question: "Did Jesus say the Pharisees were like a cup that looks clean outside but is dirty inside?", options: ["Yes", "No"], correctIndex: 0, explanation: "Jesus said they were like a cup that looks clean outside but is dirty inside!", ageGroup: "young" },
+          { question: "Can God see what's in our hearts?", options: ["Yes", "No"], correctIndex: 0, explanation: "God sees everything about us, including what's in our hearts!", ageGroup: "young" },
           { question: "What does the 'inside of the cup' represent?", options: ["Our clothes", "Our heart and true self", "Our house"], correctIndex: 1, explanation: "The inside of the cup represents what we're really like on the inside, our thoughts, feelings, and true motivations.", ageGroup: "older" },
           { question: "Why is it easier to 'clean the outside' than the inside?", options: ["Outside cleaning is visible to others", "Inside cleaning is impossible", "God only cares about the outside"], correctIndex: 0, explanation: "It's easier to look good to others than to truly change our hearts. But God sees both.", ageGroup: "older" },
           { question: "In what ways might we 'polish the outside of our cup' while neglecting the inside?", options: ["By attending church but not practicing love at home", "By reading the Bible daily", "By praying sincerely"], correctIndex: 0, explanation: "Religious activities are good, but they can become a substitute for genuine heart change if we're not careful.", ageGroup: "family" },
@@ -117,8 +117,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "What did the Pharisees carefully measure?", options: ["Their food", "Their tiny herbs for God", "Their money"], correctIndex: 1, explanation: "They measured even their smallest plants to make sure they gave God the right amount!", ageGroup: "young" },
-          { question: "What did they forget about?", options: ["Their lunch", "Being kind and loving people", "Their hats"], correctIndex: 1, explanation: "They forgot about the most important things: justice and love!", ageGroup: "young" },
+          { question: "Did the Pharisees carefully measure their tiny herbs for God?", options: ["Yes", "No"], correctIndex: 0, explanation: "They measured even their smallest plants to make sure they gave God the right amount!", ageGroup: "young" },
+          { question: "Did the Pharisees forget about being kind and loving people?", options: ["Yes", "No"], correctIndex: 0, explanation: "They forgot about the most important things: justice and love!", ageGroup: "young" },
           { question: "Jesus said the Pharisees neglected 'justice and the love of God.' What does that mean?", options: ["They didn't go to church", "They didn't care about treating people fairly or loving God genuinely", "They didn't pray enough"], correctIndex: 1, explanation: "Justice means treating people fairly, and love of God means genuinely caring about what God cares about, not just following rules.", ageGroup: "older" },
           { question: "Can someone follow all the rules and still miss what God really wants?", options: ["No, following rules is enough", "Yes, if they do it without love", "Rules don't matter"], correctIndex: 1, explanation: "God wants our hearts, not just our compliance. Following rules without love misses the point.", ageGroup: "older" },
           { question: "What 'small things' might we focus on in our faith while missing the 'big things'?", options: ["All religious practices are small things", "Things like church attendance or Bible reading can become substitutes for actually loving people", "There are no big things"], correctIndex: 1, explanation: "The goal isn't to stop the small practices, but to make sure they serve the bigger purposes of justice and love.", ageGroup: "family" },
@@ -147,8 +147,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "Did the leaders help people carry their heavy loads?", options: ["Yes, they helped a lot", "No, they just watched", "They carried everything"], correctIndex: 1, explanation: "The leaders didn't help at all! They just stood and watched.", ageGroup: "young" },
-          { question: "What did Jesus think about this?", options: ["He liked it", "He thought it was wrong", "He didn't notice"], correctIndex: 1, explanation: "Jesus said it was wrong to give people heavy burdens and not help them!", ageGroup: "young" },
+          { question: "Did the leaders help people carry their heavy loads?", options: ["Yes", "No"], correctIndex: 1, explanation: "The leaders didn't help at all! They just stood and watched.", ageGroup: "young" },
+          { question: "Did Jesus think it was wrong that the leaders didn't help?", options: ["Yes", "No"], correctIndex: 0, explanation: "Jesus said it was wrong to give people heavy burdens and not help them!", ageGroup: "young" },
           { question: "What does it mean to 'load people with burdens hard to bear'?", options: ["Give them heavy boxes", "Create impossible standards and judge people who can't meet them", "Help them exercise"], correctIndex: 1, explanation: "It means setting rules so impossible that no one can follow them, then judging people for failing.", ageGroup: "older" },
           { question: "How should faith leaders treat people?", options: ["Make things harder", "Help people grow with grace and support", "Ignore them"], correctIndex: 1, explanation: "Good leaders help carry people's burdens, just like Jesus does for us.", ageGroup: "older" },
           { question: "Have you ever felt crushed by religious expectations? How does Jesus' response here change that?", options: ["Jesus adds more rules", "Jesus calls out those who burden others and offers to help carry the load himself", "Jesus doesn't care"], correctIndex: 1, explanation: "Jesus stands against using faith as a weapon. He came to give rest, not more burdens.", ageGroup: "family" },
@@ -177,8 +177,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "What did the leaders do with the key to knowing God?", options: ["They shared it", "They hid it away", "They ate it"], correctIndex: 1, explanation: "They kept the key to knowing God all to themselves and wouldn't let others in!", ageGroup: "young" },
-          { question: "What should they have done?", options: ["Hidden the key better", "Opened the door for everyone", "Nothing"], correctIndex: 1, explanation: "They should have used the key to help everyone find God!", ageGroup: "young" },
+          { question: "Did the leaders share the key to knowing God with everyone?", options: ["Yes", "No"], correctIndex: 1, explanation: "They kept the key to knowing God all to themselves and wouldn't let others in!", ageGroup: "young" },
+          { question: "Should the leaders have opened the door for everyone?", options: ["Yes", "No"], correctIndex: 0, explanation: "They should have used the key to help everyone find God!", ageGroup: "young" },
           { question: "What is the 'key of knowledge'?", options: ["A golden key", "Understanding of God's Word and the way to God", "A school test"], correctIndex: 1, explanation: "The key of knowledge is understanding God's Word and helping people know God personally.", ageGroup: "older" },
           { question: "Why did Jesus say this was the worst thing?", options: ["Because keys are expensive", "Because they stopped people from finding God", "Because he likes doors"], correctIndex: 1, explanation: "Standing between people and God is the most serious failure of all.", ageGroup: "older" },
           { question: "In what ways can religious institutions or individuals today 'take away the key of knowledge'?", options: ["By making faith seem exclusive", "By making God's love inaccessible through complexity, judgment, or gatekeeping", "It can't happen today"], correctIndex: 1, explanation: "Anytime we make knowing God harder than it needs to be, or block people from experiencing grace, we repeat this pattern.", ageGroup: "family" },
@@ -207,8 +207,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "Was Jesus scared when the leaders got angry?", options: ["Yes, very scared", "No, he kept going", "He ran away"], correctIndex: 1, explanation: "Jesus was brave! He kept going because he loved everyone.", ageGroup: "young" },
-          { question: "Where was Jesus walking to?", options: ["Home", "Jerusalem, where he would die for us", "The store"], correctIndex: 1, explanation: "Jesus was walking to Jerusalem, where he would show the biggest love ever by dying for us.", ageGroup: "young" },
+          { question: "Was Jesus scared when the leaders got angry?", options: ["Yes", "No"], correctIndex: 1, explanation: "Jesus was brave! He kept going because he loved everyone.", ageGroup: "young" },
+          { question: "Was Jesus walking to Jerusalem to show the biggest love ever?", options: ["Yes", "No"], correctIndex: 0, explanation: "Jesus was walking to Jerusalem, where he would show the biggest love ever by dying for us.", ageGroup: "young" },
           { question: "Why did Jesus confront the Pharisees if he knew they'd turn against him?", options: ["He was angry", "He wanted to help them see the truth, even at great cost", "He didn't know"], correctIndex: 1, explanation: "Jesus confronted them because he loved them and wanted them to change, even though it would cost him everything.", ageGroup: "older" },
           { question: "Who did Jesus die for?", options: ["Only good people", "Only sinners", "Everyone: sinners, Pharisees, all of us"], correctIndex: 2, explanation: "Jesus died for everyone. That's the beauty of the gospel.", ageGroup: "older" },
           { question: "What does it mean that Jesus' confrontation was 'compassion, not cruelty'?", options: ["He was being mean", "Hard truth spoken in love is an act of care, not punishment", "He didn't care about feelings"], correctIndex: 1, explanation: "When Jesus speaks hard truth, it's because he loves us too much to leave us where we are.", ageGroup: "family" },
@@ -237,8 +237,8 @@ export const DEMO_SERMON_DATA = {
       },
       quiz: {
         questions: [
-          { question: "What does it mean to repent?", options: ["To hide", "To say you're sorry and really change", "To run away"], correctIndex: 1, explanation: "Repenting means saying sorry to God and really wanting to change with his help!", ageGroup: "young" },
-          { question: "Can God change us on the inside?", options: ["No, we stay the same", "Yes! God loves to help us change", "Only on the outside"], correctIndex: 1, explanation: "God loves to change our hearts and make us more like Jesus!", ageGroup: "young" },
+          { question: "Does repenting mean saying you're sorry and really wanting to change?", options: ["Yes", "No"], correctIndex: 0, explanation: "Repenting means saying sorry to God and really wanting to change with his help!", ageGroup: "young" },
+          { question: "Can God change us on the inside?", options: ["Yes", "No"], correctIndex: 0, explanation: "God loves to change our hearts and make us more like Jesus!", ageGroup: "young" },
           { question: "What was more powerful in the story: the man's mistakes or his repentance?", options: ["His mistakes", "His repentance and asking for forgiveness", "Neither"], correctIndex: 1, explanation: "His honest repentance was so powerful it actually brought someone to faith!", ageGroup: "older" },
           { question: "Why does genuine change come from the inside, not the outside?", options: ["Because the outside doesn't matter", "Because outward change without heart change is just acting", "Because God only sees the inside"], correctIndex: 1, explanation: "Lasting change happens when God transforms our hearts. Everything else follows from that.", ageGroup: "older" },
           { question: "What does this sermon teach us about the relationship between vulnerability and spiritual growth?", options: ["Being vulnerable is weakness", "Honest vulnerability before God and others is where genuine transformation begins", "Keep everything private"], correctIndex: 1, explanation: "The gospel doesn't require perfection. It requires honesty. And from honesty, God brings real change.", ageGroup: "family" },
