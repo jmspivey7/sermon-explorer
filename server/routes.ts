@@ -55,6 +55,33 @@ export async function registerRoutes(server: Server, app: Express) {
     res.json(sermon);
   });
 
+  app.delete("/api/sermons/:id", (req, res) => {
+    const sermon = processedSermons.get(req.params.id);
+    if (!sermon) return res.status(404).json({ message: "Sermon not found" });
+
+    const sermonId = req.params.id;
+    processedSermons.delete(sermonId);
+
+    const videosDir = path.resolve("generated", "videos");
+    if (fs.existsSync(videosDir)) {
+      const files = fs.readdirSync(videosDir);
+      for (const file of files) {
+        if (file.startsWith(sermonId)) {
+          fs.unlinkSync(path.join(videosDir, file));
+        }
+      }
+    }
+
+    for (const [key] of videoGenerationJobs) {
+      if (key.startsWith(sermonId)) {
+        videoGenerationJobs.delete(key);
+      }
+    }
+
+    console.log(`Sermon deleted: ${sermonId}`);
+    res.json({ message: "Sermon deleted" });
+  });
+
   // Get a specific scene
   app.get("/api/sermons/:id/scenes/:sceneIndex", (req, res) => {
     const sermon = processedSermons.get(req.params.id);

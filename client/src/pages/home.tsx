@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { BookOpen, Upload, ChevronRight, ShieldCheck } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, Upload, ChevronRight, ShieldCheck, Trash2, Settings } from "lucide-react";
 const cdmLogo = "/cdm-logo.webp";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const { data: sermons } = useQuery<any[]>({
     queryKey: ["/api/sermons"],
@@ -14,6 +18,22 @@ export default function Home() {
       return res.json();
     },
   });
+
+  async function handleDelete(sermonId: string) {
+    setDeletingId(sermonId);
+    try {
+      const res = await fetch(`/api/sermons/${sermonId}`, { method: "DELETE" });
+      if (res.ok) {
+        queryClient.invalidateQueries({ queryKey: ["/api/sermons"] });
+      }
+    } catch {
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
+    }
+  }
+
+  const allSermons = sermons || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-se-navy via-[#1e3454] to-se-navy">
@@ -45,7 +65,7 @@ export default function Home() {
         </h2>
 
         <div className="space-y-3">
-          {sermons?.filter(s => s.status === "ready").map((sermon) => (
+          {allSermons.filter(s => s.status === "ready").map((sermon) => (
             <motion.button
               key={sermon.id}
               initial={{ opacity: 0, y: 10 }}
@@ -72,7 +92,7 @@ export default function Home() {
             </motion.button>
           ))}
 
-          {sermons?.filter(s => s.status === "processing").map((sermon) => (
+          {allSermons.filter(s => s.status === "processing").map((sermon) => (
             <div
               key={sermon.id}
               className="w-full bg-white/5 border border-white/10 rounded-2xl p-5
@@ -87,6 +107,13 @@ export default function Home() {
               </div>
             </div>
           ))}
+
+          {allSermons.filter(s => s.status === "ready").length === 0 && (
+            <div className="text-center py-8">
+              <BookOpen className="w-10 h-10 text-white/15 mx-auto mb-3" />
+              <p className="text-white/30 text-sm font-display">No sermons available yet</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -104,8 +131,8 @@ export default function Home() {
 
       {/* Admin Section */}
       <div className="max-w-lg mx-auto px-6 pb-16">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-          <p className="text-white/40 text-xs font-display mb-4">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+          <p className="text-white/40 text-xs font-display">
             The tools below are available to church administrators for managing sermon content.
           </p>
 
@@ -125,6 +152,75 @@ export default function Home() {
               <span className="text-white/40 text-xs">Process a transcript into an interactive storybook</span>
             </div>
           </motion.button>
+
+          {/* Manage Sermons */}
+          <div>
+            <div className="flex items-center gap-2 mb-3 pt-2">
+              <Settings className="w-4 h-4 text-white/40" />
+              <h3 className="font-display font-bold text-white/60 text-xs uppercase tracking-wider">Manage Sermons</h3>
+            </div>
+
+            {allSermons.length === 0 ? (
+              <p className="text-white/20 text-xs font-display py-3 text-center">No sermons to manage</p>
+            ) : (
+              <div className="space-y-2">
+                {allSermons.map((sermon) => (
+                  <div
+                    key={sermon.id}
+                    className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center gap-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-display font-bold text-white/80 text-sm truncate">{sermon.title}</p>
+                      <p className="text-white/40 text-xs">
+                        {sermon.scripture}
+                        {sermon.status === "processing" && " — Processing..."}
+                      </p>
+                    </div>
+
+                    <AnimatePresence mode="wait">
+                      {confirmDeleteId === sermon.id ? (
+                        <motion.div
+                          key="confirm"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="flex items-center gap-2 flex-shrink-0"
+                        >
+                          <button
+                            onClick={() => handleDelete(sermon.id)}
+                            disabled={deletingId === sermon.id}
+                            className="px-3 py-1.5 bg-red-500/20 border border-red-500/40 rounded-lg text-red-400 text-xs font-display font-bold
+                                       hover:bg-red-500/30 transition-all disabled:opacity-50"
+                          >
+                            {deletingId === sermon.id ? "Deleting..." : "Confirm"}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white/50 text-xs font-display
+                                       hover:bg-white/10 transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <motion.button
+                          key="delete"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          onClick={() => setConfirmDeleteId(sermon.id)}
+                          className="p-2 rounded-lg hover:bg-red-500/15 transition-all group/del flex-shrink-0"
+                          title="Delete sermon"
+                        >
+                          <Trash2 className="w-4 h-4 text-white/25 group-hover/del:text-red-400 transition-colors" />
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
