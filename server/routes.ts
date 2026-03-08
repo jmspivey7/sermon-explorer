@@ -429,7 +429,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
-  const safetyPrefix = "STRICT RULES FOR THIS IMAGE — ZERO TOLERANCE: This image is for a children's storybook (ages 4-12). 1) ABSOLUTELY NO text, words, letters, numbers, names, labels, signs, writing, or readable content of ANY kind anywhere in the image. 2) ABSOLUTELY NO alcohol, beer, wine, liquor, bottles, glasses, bars, pubs, taverns, cocktails. 3) ABSOLUTELY NO gambling, poker chips, playing cards, dice, casinos, slot machines. 4) ABSOLUTELY NO drugs, smoking, cigarettes, pills, syringes. 5) ABSOLUTELY NO weapons, violence, blood, gore. 6) All settings must be wholesome, bright, and child-safe. ";
+  const safetyPrefix = "Children's storybook illustration for ages 4-12. The scene must be entirely wholesome, bright, cheerful, and family-friendly. Only include child-safe settings like gardens, villages, fields, temples, homes, paths, hillsides, or classrooms. The image must contain zero text, zero words, zero letters, zero numbers, zero writing of any kind. ";
   const safePrompt = safetyPrefix + prompt;
 
   const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
@@ -446,9 +446,12 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
         await new Promise(r => setTimeout(r, delay));
       }
 
+      const currentPrompt = attempt === 0 ? safePrompt
+        : `Wholesome children's storybook illustration, colorful 3D animated style, big-eyed characters, warm lighting, bright cheerful scene, family-friendly, widescreen 16:9, no text or writing. ${prompt.replace(/[^\w\s,.'"-]/g, ' ').substring(0, 500)}`;
+
       const response = await client.models.generateImages({
         model: "imagen-4.0-generate-001",
-        prompt: safePrompt,
+        prompt: currentPrompt,
         config: {
           numberOfImages: 1,
           aspectRatio: "16:9",
@@ -456,7 +459,11 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
       });
 
       if (!response.generatedImages || response.generatedImages.length === 0) {
-        throw new Error("Imagen returned no images");
+        if (attempt < maxRetries - 1) {
+          console.warn(`Imagen safety filter likely blocked prompt for ${label}, will retry with simplified prompt`);
+          continue;
+        }
+        throw new Error("Imagen returned no images — prompt may have been blocked by safety filter");
       }
 
       const imageBytes = response.generatedImages[0].image?.imageBytes;
