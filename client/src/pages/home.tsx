@@ -45,10 +45,10 @@ export default function Home() {
         >
           <img src={cdmLogo} alt="CDM Discipleship Ministries" className="h-[195px] mx-auto mb-1" />
           <h1 className="font-display text-5xl font-extrabold text-gray-800 mb-3">
-            <span className="font-accent text-6xl text-se-blue">Sermon</span>{" "}Explorer
+            <span className="font-accent text-6xl text-se-blue">Sermon</span>{" "}<span className="font-accent text-6xl text-gray-800">Explorer</span>
           </h1>
           <p className="text-se-green font-display text-lg font-semibold">
-            Sunday's Sermon, <span className="font-accent text-xl">Brought to Life</span>
+            <span className="font-accent text-xl">Sunday's Sermon, Brought to Life</span>
           </p>
           <p className="text-gray-500 mt-2 text-sm max-w-md mx-auto">
             Interactive illustrated storybooks that transform weekly sermons into
