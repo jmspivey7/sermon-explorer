@@ -51,12 +51,15 @@ export default function Home() {
             </p>
           </motion.button>
 
-          <motion.div
+          <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setLocation("/worship")}
             className="w-full bg-white border-2 border-gray-200 rounded-2xl p-8
-                       shadow-sm text-center"
+                       hover:border-se-green/60 transition-all group shadow-sm text-center"
           >
             <h2 className="font-display text-4xl font-extrabold text-gray-800 mb-2">
               <span className="font-accent text-5xl text-se-blue">Worship</span>{" "}
@@ -69,7 +72,7 @@ export default function Home() {
               Interactive training to explain and explore the essential elements
               of corporate worship for young people.
             </p>
-          </motion.div>
+          </motion.button>
         </div>
       </div>
 
