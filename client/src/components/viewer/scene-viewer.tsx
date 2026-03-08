@@ -144,16 +144,6 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
     }
   }, [hasVideo, sceneIndex]);
 
-  function handleVideoEnded() {
-    setVideoDone(true);
-    if (videoRef.current) {
-      const duration = videoRef.current.duration;
-      if (duration && isFinite(duration)) {
-        videoRef.current.currentTime = duration - 0.01;
-      }
-    }
-  }
-
   function toggleMute() {
     setIsMuted((m) => {
       const newMuted = !m;
@@ -181,20 +171,23 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               className="w-full h-full object-cover"
               autoPlay
               muted
-              loop
               playsInline
               poster={scene.imageUrl || undefined}
-              onEnded={handleVideoEnded}
+              onEnded={() => {
+                setVideoDone(true);
+                if (videoRef.current) {
+                  videoRef.current.currentTime = 0;
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
               onLoadedData={() => {
-                console.log(`[SceneViewer] Video loaded for scene ${sceneIndex}`);
                 setVideoBuffering(false);
                 if (videoRef.current) {
                   videoRef.current.muted = isMuted;
                   videoRef.current.play().catch(() => {});
                 }
               }}
-              onError={(e) => {
-                console.error(`[SceneViewer] Video error for scene ${sceneIndex}:`, e);
+              onError={() => {
                 setVideoUrl(null);
                 setVideoDone(true);
               }}

@@ -175,7 +175,7 @@ export async function registerRoutes(server: Server, app: Express) {
     try {
       const { text, voice } = req.body;
       const mp3 = await openai.audio.speech.create({
-        model: "tts-1",
+        model: "tts-1-hd",
         voice: voice || "nova",
         input: text,
         speed: 0.9,
