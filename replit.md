@@ -14,7 +14,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 ```
 client/          - React frontend (Vite root)
   src/
-    pages/       - Home, Upload, Viewer pages
+    pages/       - Home (hub), Sermons (list), Admin (manage), Upload, Viewer pages
     components/  - UI components
       viewer/    - SceneViewer, SceneQuiz, DiscussionTime, StorySetup, FinalSummary
     lib/         - Query client and utilities
@@ -50,9 +50,9 @@ script/
 - Colorful cinematic 3D animated style — no realistic rendering. No copyrighted characters or brands.
 - Never depicts God, Jesus, or the Holy Spirit — uses symbolic light/warmth instead
 - No mouth movements or speaking gestures on characters
-- Auto-narration via TTS (model tts-1-hd, voice nova, speed 0.9) starts immediately when each scene appears
+- Auto-narration via TTS (model tts-1, voice nova, speed 0.9) starts immediately when each scene appears
 - Three age groups: Young (4-6), Older (7-10), Family (11+)
-- Fixed bottom action bar with Next Scene / Skip buttons
+- Inline action buttons (Next Scene / Skip) below content — skip advances through phases in order (scene → quiz → discussion → next scene)
 - In-memory sermon storage (no database)
 - Sermon deletion with image cleanup
 

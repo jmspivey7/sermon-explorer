@@ -43,7 +43,7 @@ export default function Viewer() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <p className="text-gray-500">Sermon not found</p>
-        <button onClick={() => setLocation("/")} className="mt-4 text-se-blue underline">Go back</button>
+        <button onClick={() => setLocation("/sermons")} className="mt-4 text-se-blue underline">Go back</button>
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default function Viewer() {
             <StorySetup
               sermon={sermon}
               onComplete={handleSetupComplete}
-              onBack={() => setLocation("/")}
+              onBack={() => setLocation("/sermons")}
             />
           </motion.div>
         )}
@@ -204,7 +204,7 @@ export default function Viewer() {
               totalQuestions={totalQuestions}
               userName={userName}
               onRestart={() => { setCurrentScene(0); setScore(0); setTotalQuestions(0); setPhase("setup"); }}
-              onHome={() => setLocation("/")}
+              onHome={() => setLocation("/sermons")}
             />
           </motion.div>
         )}
