@@ -272,13 +272,17 @@ CRITICAL STYLE AND CONTENT RULES:
 - NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Instead, represent their presence through symbolic imagery: warm golden light, a gentle breeze, glowing clouds, a radiant sunrise, a guiding star, a comforting glow, or other abstract/symbolic visuals.
 - Characters must NEVER have open mouths or appear to be speaking.
 
+REAL-WORLD ILLUSTRATION RULE:
+- If the pastor used a memorable real-world example, analogy, or personal story in the sermon (e.g., jumping off a high dive to illustrate overcoming fear, or a child sharing a lunchbox to illustrate generosity), then 1-2 of the scenes (roughly 10-20% of total scenes) should have their imagePrompt depict that real-world illustration in a modern-day setting rather than a biblical setting. These scenes should still use the same colorful cinematic 3D animated style, but show the modern scenario the pastor described (a swimming pool, a school cafeteria, etc.).
+- If the sermon does NOT contain any real-world examples or personal stories, then ALL imagePrompts should use biblical settings as usual. Do not force modern-day scenes if none exist in the sermon.
+
 For each scene, provide:
 - title: A short, engaging scene title
 - content: The core teaching content of this scene (2-3 paragraphs from the sermon)
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed image generation prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting, biblical setting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text or words in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking. The image should be widescreen (16:9 aspect ratio) with rich detail and depth.
+- imagePrompt: A detailed image generation prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text or words in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking. The image should be widescreen (16:9 aspect ratio) with rich detail and depth. For scenes based on the pastor's real-world illustrations, use a modern-day setting that matches the story described. For all other scenes, use a biblical setting.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -311,13 +315,15 @@ ${text.substring(0, 12000)}`,
 
 CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
 
+REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples or personal stories, 1-2 scenes (10-20%) should depict those modern-day illustrations instead of biblical settings. If no real-world examples exist, use biblical settings for all scenes.
+
 For each scene, provide:
 - title: A short, engaging scene title
 - content: The core teaching content of this scene (1-2 paragraphs from the sermon)
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A prompt for a colorful cinematic 3D animated style illustration with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting, biblical setting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths. Widescreen 16:9 with rich detail.
+- imagePrompt: A prompt for a colorful cinematic 3D animated style illustration with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths. Widescreen 16:9 with rich detail. Use modern-day setting for scenes based on pastor's real-world stories; biblical setting for all others.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
