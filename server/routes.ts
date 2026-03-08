@@ -5,7 +5,6 @@ import mammoth from "mammoth";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
 import express from "express";
 
 function getOpenAI(): OpenAI {
@@ -16,30 +15,6 @@ const openai = new Proxy({} as OpenAI, {
     return (getOpenAI() as any)[prop];
   }
 });
-
-function getAnthropic(): Anthropic {
-  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-}
-
-const CLAUDE_MODEL = "claude-sonnet-4-20250514";
-
-async function claudeJSON(system: string, userContent: string, maxTokens = 8192, temperature = 0.7): Promise<any> {
-  const client = getAnthropic();
-  const response = await client.messages.create({
-    model: CLAUDE_MODEL,
-    max_tokens: maxTokens,
-    temperature,
-    system,
-    messages: [{ role: "user", content: userContent }],
-  });
-
-  const text = response.content[0].type === "text" ? response.content[0].text : "";
-
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("Claude did not return valid JSON");
-  return JSON.parse(jsonMatch[0]);
-}
-
 const upload = multer({ dest: "uploads/" });
 
 const processedSermons: Map<string, any> = new Map();
@@ -257,8 +232,12 @@ async function processSermon(sermonId: string, text: string) {
 }
 
 async function analyzeSermon(text: string) {
-  return claudeJSON(
-    `You are a sermon analysis expert. Analyze the given sermon transcript and extract structured information. Respond with JSON only, no other text:
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `You are a sermon analysis expert. Analyze the given sermon transcript and extract structured information. Respond with JSON:
 {
   "title": "A clear, engaging title for this sermon",
   "scripture": "The primary Scripture passage (e.g., 'Luke 11:37-54')",
@@ -267,14 +246,22 @@ async function analyzeSermon(text: string) {
   "targetAudience": "Who this sermon is primarily addressing",
   "emotionalArc": "The emotional journey of the sermon (e.g., 'conviction to grace')"
 }`,
-    text.substring(0, 8000),
-    4096,
-    0.3
-  );
+      },
+      { role: "user", content: text.substring(0, 8000) },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.3,
+  });
+  return JSON.parse(response.choices[0].message.content || "{}");
 }
 
 async function generateScenes(text: string, analysis: any) {
-  const systemPrompt = `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
 
 CRITICAL STYLE AND CONTENT RULES:
 - All visuals must be in a colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
@@ -294,22 +281,79 @@ For each scene, provide:
 - imagePrompt: A detailed image generation prompt for a colorful, cinematic 3D animated style illustration with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. Warm cinematic lighting. Suitable for children ages 4-12. No copyrighted characters or recognizable brands. Never include text or words in images. Never depict God or Jesus as a character — use symbolic light, glowing clouds, or radiant warmth instead. No characters should have open mouths or appear to be speaking. The image should be widescreen (16:9 aspect ratio) with rich detail and depth. For scenes based on the pastor's real-world illustrations, use a modern-day setting that matches the story described. For all other scenes, use a biblical setting.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
-Respond with JSON only: { "scenes": [...] }`;
-
-  const userContent = `Sermon title: ${analysis.title}
+Respond with JSON: { "scenes": [...] }`,
+      },
+      {
+        role: "user",
+        content: `Sermon title: ${analysis.title}
 Scripture: ${analysis.scripture}
 Themes: ${analysis.keyThemes?.join(", ")}
 
 Full sermon text:
-${text.substring(0, 12000)}`;
+${text.substring(0, 12000)}`,
+      },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+    max_tokens: 16384,
+  });
 
-  const result = await claudeJSON(systemPrompt, userContent, 16384, 0.7);
-  return result.scenes || [];
+  const raw = response.choices[0].message.content || '{"scenes":[]}';
+
+  if (response.choices[0].finish_reason === "length") {
+    console.warn("Scene generation response was truncated, retrying with fewer scenes...");
+    const retryResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
+
+CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
+
+REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples or personal stories, 1-2 scenes (10-20%) should depict those modern-day illustrations instead of biblical settings. If no real-world examples exist, use biblical settings for all scenes.
+
+For each scene, provide:
+- title: A short, engaging scene title
+- content: The core teaching content of this scene (1-2 paragraphs from the sermon)
+- scriptureRef: Any Bible verse referenced in this section
+- keyPoint: The single most important idea in this scene
+- emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
+- imagePrompt: A prompt for a colorful cinematic 3D animated style illustration with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths. Widescreen 16:9 with rich detail. Use modern-day setting for scenes based on pastor's real-world stories; biblical setting for all others.
+- animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
+
+Respond with JSON: { "scenes": [...] }`,
+        },
+        {
+          role: "user",
+          content: `Sermon title: ${analysis.title}
+Scripture: ${analysis.scripture}
+Themes: ${analysis.keyThemes?.join(", ")}
+
+Full sermon text:
+${text.substring(0, 8000)}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 16384,
+    });
+    const retryRaw = retryResponse.choices[0].message.content || '{"scenes":[]}';
+    const retryParsed = JSON.parse(retryRaw);
+    return retryParsed.scenes || [];
+  }
+
+  const parsed = JSON.parse(raw);
+  return parsed.scenes || [];
 }
 
 async function generateNarratives(scene: any) {
-  return claudeJSON(
-    `You create age-appropriate retellings of sermon scenes. For each scene, write THREE versions:
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `You create age-appropriate retellings of sermon scenes. For each scene, write THREE versions:
 
 1. "young" (ages 4-6): Very simple sentences. Use concrete images. 3-4 sentences max. No abstract theology.
 2. "older" (ages 7-10): Simple but more detailed. Can handle basic metaphors. 4-6 sentences.
@@ -317,14 +361,20 @@ async function generateNarratives(scene: any) {
 
 Each version should tell the same story but at the right level. Be warm, never scary.
 
-Respond with JSON only: { "young": "...", "older": "...", "family": "..." }`,
-    `Scene: ${scene.title}
+Respond with JSON: { "young": "...", "older": "...", "family": "..." }`,
+      },
+      {
+        role: "user",
+        content: `Scene: ${scene.title}
 Key Point: ${scene.keyPoint}
 Content: ${scene.content}
 Scripture: ${scene.scriptureRef || "none"}`,
-    4096,
-    0.7
-  );
+      },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+  });
+  return JSON.parse(response.choices[0].message.content || "{}");
 }
 
 async function generateImage(prompt: string, sermonId?: string, sceneIndex?: number): Promise<string> {
@@ -380,10 +430,14 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
 }
 
 async function generateQuiz(content: string, ageGroup: string) {
-  return claudeJSON(
-    `Create quiz questions about a sermon scene for families. Generate questions at multiple levels.
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `Create quiz questions about a sermon scene for families. Generate questions at multiple levels.
 
-Respond with JSON only:
+Respond with JSON:
 {
   "questions": [
     {
@@ -404,17 +458,24 @@ IMPORTANT RULES:
 - "family" questions (ages 11+): Multiple choice with 3 text options. Can be deeper and more reflective.
 - ALL questions must be answerable from the narration text alone. NEVER ask the user to identify, compare, or choose between images, pictures, illustrations, or visual elements. The quiz is text-only — the user cannot see any images while answering.
 - NEVER reference "which picture" or "which image" or ask users to compare visual options.`,
-    content,
-    4096,
-    0.7
-  );
+      },
+      { role: "user", content: content },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+  });
+  return JSON.parse(response.choices[0].message.content || '{"questions":[]}');
 }
 
 async function generateDiscussionPrompts(scene: any) {
-  return claudeJSON(
-    `Create family discussion prompts for a sermon scene. These should help parents and children talk about the sermon together at home.
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `Create family discussion prompts for a sermon scene. These should help parents and children talk about the sermon together at home.
 
-Respond with JSON only:
+Respond with JSON:
 {
   "prompts": [
     {
@@ -426,8 +487,14 @@ Respond with JSON only:
 }
 
 Create 2-3 prompts per scene. Make them practical, warm, and accessible to parents who may not be deeply Bible-literate.`,
-    `Scene: ${scene.title}\nKey Point: ${scene.keyPoint}\nContent: ${scene.content}`,
-    4096,
-    0.8
-  );
+      },
+      {
+        role: "user",
+        content: `Scene: ${scene.title}\nKey Point: ${scene.keyPoint}\nContent: ${scene.content}`,
+      },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.8,
+  });
+  return JSON.parse(response.choices[0].message.content || '{"prompts":[]}');
 }

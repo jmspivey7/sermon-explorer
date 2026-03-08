@@ -7,7 +7,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion + CDM Brand
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
-- **AI**: Anthropic Claude Sonnet 4 for content generation, OpenAI TTS for narration, Google Gemini Imagen 3 for illustrations
+- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Google Gemini Imagen 3 for illustrations
 
 ## Project Structure
 
@@ -39,8 +39,7 @@ script/
 
 ## Environment Variables
 
-- `ANTHROPIC_API_KEY` (secret) — Required for text generation (Claude Sonnet 4 — sermon analysis, scene generation, narratives, quizzes, discussion prompts)
-- `OPENAI_API_KEY` (secret) — Required for TTS narration only
+- `OPENAI_API_KEY` (secret) — Required for AI content generation (GPT-4o) and TTS narration
 - `GEMINI_API_KEY` (secret) — Required for image generation via Google Gemini Imagen 3
 
 ## Key Features
