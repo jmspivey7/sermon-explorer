@@ -7,12 +7,8 @@ import path from "path";
 import OpenAI from "openai";
 import { DEMO_SERMON_DATA } from "@shared/demo-data";
 
-let _openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
-  if (!_openai) {
-    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  }
-  return _openai;
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 const openai = new Proxy({} as OpenAI, {
   get(_target, prop) {
