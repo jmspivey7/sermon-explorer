@@ -26,15 +26,15 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
   if (questions.length === 0) {
     return (
       <div className="px-5 py-10 text-center pb-24">
-        <p className="text-white/60 font-display mb-4">No quiz for this scene</p>
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+        <p className="text-gray-500 font-display mb-4">No quiz for this scene</p>
+        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
           <button
             onClick={onSkip}
             className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
                        hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
-            <span className="font-display font-bold text-se-navy text-sm">Continue</span>
-            <ChevronRight className="w-4 h-4 text-se-navy" />
+            <span className="font-display font-bold text-white text-sm">Continue</span>
+            <ChevronRight className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>
@@ -75,9 +75,9 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-se-green" />
-          <span className="font-display font-bold text-white text-sm"><span className="font-accent text-lg text-se-green">Quiz</span> Time!</span>
+          <span className="font-display font-bold text-gray-800 text-sm"><span className="font-accent text-lg text-se-green">Quiz</span> Time!</span>
         </div>
-        <span className="text-white/40 font-display text-xs">
+        <span className="text-gray-400 font-display text-xs">
           {currentQ + 1} / {total}
         </span>
       </div>
@@ -87,7 +87,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-all ${
-              i < currentQ ? "bg-se-blue" : i === currentQ ? "bg-se-green" : "bg-white/15"
+              i < currentQ ? "bg-se-blue" : i === currentQ ? "bg-se-green" : "bg-gray-200"
             }`}
           />
         ))}
@@ -98,26 +98,26 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <p className="text-white font-display font-bold text-lg mb-6 leading-snug">
+        <p className="text-gray-800 font-display font-bold text-lg mb-6 leading-snug">
           {q.question}
         </p>
 
         <div className="space-y-3 mb-6">
           {q.options.map((option: string, idx: number) => {
-            let bg = "bg-white/8 border-white/15";
-            let textColor = "text-white/90";
-            let letterBg = "bg-white/10";
+            let bg = "bg-gray-50 border-gray-200";
+            let textColor = "text-gray-700";
+            let letterBg = "bg-gray-100";
 
             if (showResult && idx === q.correctIndex) {
-              bg = "bg-green-500/20 border-green-500/50";
-              textColor = "text-green-300";
-              letterBg = "bg-green-500/30";
+              bg = "bg-green-50 border-green-300";
+              textColor = "text-green-700";
+              letterBg = "bg-green-100";
             } else if (showResult && idx === selected && !isCorrect) {
-              bg = "bg-red-500/20 border-red-500/50";
-              textColor = "text-red-300";
-              letterBg = "bg-red-500/30";
+              bg = "bg-red-50 border-red-300";
+              textColor = "text-red-700";
+              letterBg = "bg-red-100";
             } else if (selected === idx && !showResult) {
-              bg = "bg-se-blue/20 border-se-blue/50";
+              bg = "bg-se-blue/10 border-se-blue/50";
             }
 
             return (
@@ -135,10 +135,10 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
                   {option}
                 </span>
                 {showResult && idx === q.correctIndex && (
-                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
                 )}
                 {showResult && idx === selected && !isCorrect && (
-                  <XCircle className="w-5 h-5 text-red-400" />
+                  <XCircle className="w-5 h-5 text-red-500" />
                 )}
               </motion.button>
             );
@@ -153,31 +153,31 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
           >
             <div className={`rounded-2xl p-4 border ${
               isCorrect
-                ? "bg-green-500/10 border-green-500/30"
-                : "bg-amber-500/10 border-amber-500/30"
+                ? "bg-green-50 border-green-200"
+                : "bg-amber-50 border-amber-200"
             }`}>
               <div className="flex items-center gap-2 mb-2">
                 {isCorrect ? (
                   <>
-                    <Trophy className="w-4 h-4 text-green-400" />
-                    <span className="font-display font-bold text-green-400 text-sm">Great job!</span>
+                    <Trophy className="w-4 h-4 text-green-500" />
+                    <span className="font-display font-bold text-green-600 text-sm">Great job!</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span className="font-display font-bold text-amber-400 text-sm">Good try!</span>
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span className="font-display font-bold text-amber-600 text-sm">Good try!</span>
                   </>
                 )}
               </div>
               {q.explanation && (
-                <p className="text-white/70 font-story text-sm leading-relaxed">{q.explanation}</p>
+                <p className="text-gray-600 font-story text-sm leading-relaxed">{q.explanation}</p>
               )}
             </div>
           </motion.div>
         )}
       </motion.div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
         {showResult ? (
           <motion.button
             initial={{ opacity: 0, y: 10 }}
@@ -187,17 +187,17 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
                        hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
-            <span className="font-display font-bold text-se-navy text-sm">
+            <span className="font-display font-bold text-white text-sm">
               {isLast ? "See Discussion" : "Next Question"}
             </span>
-            <ChevronRight className="w-4 h-4 text-se-navy" />
+            <ChevronRight className="w-4 h-4 text-white" />
           </motion.button>
         ) : (
           <button
             onClick={onSkip}
             className="w-full py-2 text-center"
           >
-            <span className="font-display text-xs text-white/30 hover:text-white/50 transition-colors">
+            <span className="font-display text-xs text-gray-300 hover:text-gray-500 transition-colors">
               Skip quiz
             </span>
           </button>

@@ -21,16 +21,16 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
   if (prompts.length === 0) {
     return (
       <div className="px-5 py-10 text-center pb-24">
-        <p className="text-white/60 font-display mb-4">No discussion prompts for this scene</p>
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+        <p className="text-gray-500 font-display mb-4">No discussion prompts for this scene</p>
+        <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={onComplete}
             className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
                        hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
           >
-            <span className="font-display font-bold text-se-navy text-sm">Continue</span>
-            <ChevronRight className="w-4 h-4 text-se-navy" />
+            <span className="font-display font-bold text-white text-sm">Continue</span>
+            <ChevronRight className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       </div>
@@ -40,22 +40,22 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
   return (
     <div className="px-5 py-6 pb-28">
       <div className="text-center mb-6">
-        <div className="w-16 h-16 rounded-full bg-se-purple/20 flex items-center justify-center mx-auto mb-3">
+        <div className="w-16 h-16 rounded-full bg-se-purple/10 flex items-center justify-center mx-auto mb-3">
           <Users className="w-8 h-8 text-se-purple" />
         </div>
-        <h2 className="font-display text-xl font-extrabold text-white mb-1">
+        <h2 className="font-display text-xl font-extrabold text-gray-800 mb-1">
           <span className="font-accent text-2xl text-se-purple">Family</span> Discussion
         </h2>
-        <p className="text-white/50 font-display text-sm">
+        <p className="text-gray-500 font-display text-sm">
           Talk about what you learned together
         </p>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-6">
+      <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
         <p className="text-se-blue font-display text-xs font-bold mb-1">FROM THIS SCENE</p>
-        <p className="text-white font-display font-semibold text-sm">{scene.title}</p>
+        <p className="text-gray-800 font-display font-semibold text-sm">{scene.title}</p>
         {scene.keyPoint && (
-          <p className="text-white/60 font-story text-sm mt-1">{scene.keyPoint}</p>
+          <p className="text-gray-500 font-story text-sm mt-1">{scene.keyPoint}</p>
         )}
       </div>
 
@@ -66,17 +66,17 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.15 }}
-            className="bg-white/8 border border-white/15 rounded-2xl p-5"
+            className="bg-gray-50 border border-gray-200 rounded-2xl p-5"
           >
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-se-green/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-se-green/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <MessageCircle className="w-4 h-4 text-se-green" />
               </div>
               <div>
                 <p className="text-se-green font-display text-xs font-bold mb-1">
                   QUESTION {idx + 1}
                 </p>
-                <p className="text-white/90 font-story text-sm leading-relaxed">
+                <p className="text-gray-700 font-story text-sm leading-relaxed">
                   {prompt}
                 </p>
               </div>
@@ -91,35 +91,35 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
           animate={{ opacity: 1 }}
           whileTap={{ scale: 0.98 }}
           onClick={revealNext}
-          className="w-full rounded-2xl p-4 bg-white/5 border border-white/10
+          className="w-full rounded-2xl p-4 bg-gray-50 border border-gray-200
                      flex items-center justify-center gap-2 mb-4
-                     hover:bg-white/10 transition-all"
+                     hover:bg-gray-100 transition-all"
         >
           <Heart className="w-4 h-4 text-se-purple" />
-          <span className="font-display font-semibold text-white/70 text-sm">
+          <span className="font-display font-semibold text-gray-600 text-sm">
             Show Another Question
           </span>
         </motion.button>
       )}
 
-      <div className="bg-se-blue/10 border border-se-blue/20 rounded-2xl p-4 mb-6">
-        <p className="text-white/70 font-story text-sm leading-relaxed text-center">
+      <div className="bg-se-blue/5 border border-se-blue/15 rounded-2xl p-4 mb-6">
+        <p className="text-gray-500 font-story text-sm leading-relaxed text-center">
           Take your time with these questions. There are no wrong answers — the goal
           is to listen, share, and grow together.
         </p>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent">
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={onComplete}
           className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
                      hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
         >
-          <span className="font-display font-bold text-se-navy text-sm">
+          <span className="font-display font-bold text-white text-sm">
             {isLastScene ? "See Your Results" : "Next Scene"}
           </span>
-          <ChevronRight className="w-4 h-4 text-se-navy" />
+          <ChevronRight className="w-4 h-4 text-white" />
         </motion.button>
       </div>
     </div>

@@ -21,8 +21,8 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
-      <button onClick={onBack} className="absolute top-4 left-4 p-2 hover:bg-white/10 rounded-xl">
-        <ArrowLeft className="w-5 h-5 text-white" />
+      <button onClick={onBack} className="absolute top-4 left-4 p-2 hover:bg-gray-100 rounded-xl">
+        <ArrowLeft className="w-5 h-5 text-gray-600" />
       </button>
 
       <motion.div
@@ -31,31 +31,29 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
         className="text-center max-w-md"
       >
         <Sparkles className="w-8 h-8 text-se-green mx-auto mb-3" />
-        <h1 className="font-display text-3xl font-extrabold text-white mb-2">
+        <h1 className="font-display text-3xl font-extrabold text-gray-800 mb-2">
           {sermon.title}
         </h1>
         <p className="font-accent text-2xl text-se-green/80">a storybook journey</p>
         <p className="text-se-blue font-display font-semibold">{sermon.scripture}</p>
-        <p className="text-white/50 text-sm mt-3 leading-relaxed">{sermon.summary}</p>
+        <p className="text-gray-500 text-sm mt-3 leading-relaxed">{sermon.summary}</p>
 
-        {/* Name Input */}
         <div className="mt-8">
-          <p className="text-white/70 font-display text-sm mb-2">What's your name?</p>
+          <p className="text-gray-600 font-display text-sm mb-2">What's your name?</p>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your name..."
             className="w-full text-center text-lg font-display font-bold
-                       bg-white/10 border-2 border-white/20 rounded-2xl px-4 py-3
-                       text-white placeholder:text-white/30
+                       bg-gray-50 border-2 border-gray-200 rounded-2xl px-4 py-3
+                       text-gray-800 placeholder:text-gray-300
                        focus:outline-none focus:border-se-blue transition-all"
           />
         </div>
 
-        {/* Age Selection */}
         <div className="mt-6">
-          <p className="text-white/70 font-display text-sm mb-3">Choose your level:</p>
+          <p className="text-gray-600 font-display text-sm mb-3">Choose your level:</p>
           <div className="space-y-2">
             {AGE_OPTIONS.map((opt) => (
               <motion.button
@@ -65,16 +63,16 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
                 className={`w-full rounded-2xl p-4 flex items-center gap-4 text-left transition-all
                   ${selectedAge === opt.id
                     ? `${opt.color} shadow-lg`
-                    : "bg-white/10 border border-white/20 hover:bg-white/15"
+                    : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
                   }`}
               >
                 <span className="text-2xl">{opt.emoji}</span>
                 <div>
                   <h3 className={`font-display font-bold ${
-                    selectedAge === opt.id ? "text-se-navy" : "text-white"
+                    selectedAge === opt.id ? "text-white" : "text-gray-800"
                   }`}>{opt.label}</h3>
                   <p className={`text-xs ${
-                    selectedAge === opt.id ? "text-se-navy/70" : "text-white/50"
+                    selectedAge === opt.id ? "text-white/70" : "text-gray-500"
                   }`}>{opt.range}</p>
                 </div>
               </motion.button>
@@ -82,14 +80,13 @@ export default function StorySetup({ sermon, onComplete, onBack }: Props) {
           </div>
         </div>
 
-        {/* Start Button */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={() => {
             if (selectedAge) onComplete(selectedAge, name || "Explorer");
           }}
           disabled={!selectedAge}
-          className="mt-8 w-full child-button bg-se-blue text-se-navy disabled:opacity-30 disabled:cursor-not-allowed"
+          className="mt-8 w-full child-button bg-se-blue text-white disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <BookOpen className="w-5 h-5 inline mr-2" />
           Begin the Story

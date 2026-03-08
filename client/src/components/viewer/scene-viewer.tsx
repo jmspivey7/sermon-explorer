@@ -155,7 +155,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
 
   return (
     <div className="pb-24 relative">
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-se-navy">
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-900">
         {hasVideo ? (
           <>
             <video
@@ -206,21 +206,21 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
           </>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-se-navy via-se-navy/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent" />
 
-        <div className="absolute top-4 left-4 bg-se-navy/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5">
+        <div className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow-sm">
           <BookOpen className="w-3 h-3 text-se-blue" />
-          <span className="text-white/80 text-xs font-display font-bold">Scene {sceneIndex + 1}</span>
+          <span className="text-gray-700 text-xs font-display font-bold">Scene {sceneIndex + 1}</span>
         </div>
 
         <button
           onClick={toggleMute}
-          className="absolute top-4 right-4 bg-se-navy/80 backdrop-blur-sm rounded-full p-2 hover:bg-se-navy/90 transition-colors"
+          className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white/90 transition-colors shadow-sm"
         >
           {isMuted ? (
-            <VolumeX className="w-4 h-4 text-white/70" />
+            <VolumeX className="w-4 h-4 text-gray-600" />
           ) : (
-            <Volume2 className="w-4 h-4 text-white/70" />
+            <Volume2 className="w-4 h-4 text-gray-600" />
           )}
         </button>
 
@@ -232,7 +232,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="font-display text-2xl font-extrabold text-white mb-1"
+          className="font-display text-2xl font-extrabold text-gray-800 mb-1"
         >
           {scene.title}
         </motion.h2>
@@ -254,15 +254,15 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-5 mb-5"
+              className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-5"
             >
-              <p className="text-white/90 font-story text-sm leading-relaxed">
+              <p className="text-gray-700 font-story text-sm leading-relaxed">
                 {narrative}
               </p>
 
-              <div className="mt-4 bg-se-blue/10 border border-se-blue/30 rounded-xl p-3">
+              <div className="mt-4 bg-se-blue/10 border border-se-blue/20 rounded-xl p-3">
                 <p className="text-se-blue font-display text-xs font-bold mb-1">KEY POINT</p>
-                <p className="text-white/80 font-display text-sm font-semibold">
+                <p className="text-gray-700 font-display text-sm font-semibold">
                   {scene.keyPoint}
                 </p>
               </div>
@@ -277,7 +277,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-se-navy via-se-navy/95 to-transparent"
+            className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-8 bg-gradient-to-t from-white via-white/95 to-transparent"
           >
             <motion.button
               whileTap={{ scale: 0.98 }}
@@ -285,17 +285,17 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
                          hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
             >
-              <span className="font-display font-bold text-se-navy text-sm">
+              <span className="font-display font-bold text-white text-sm">
                 {isLast ? "Finish Story" : "Next Scene"}
               </span>
-              <ChevronRight className="w-4 h-4 text-se-navy" />
+              <ChevronRight className="w-4 h-4 text-white" />
             </motion.button>
 
             <button
               onClick={onSkip}
               className="w-full mt-2 py-2 text-center"
             >
-              <span className="font-display text-xs text-white/30 hover:text-white/50 transition-colors">
+              <span className="font-display text-xs text-gray-300 hover:text-gray-500 transition-colors">
                 Skip to next
               </span>
             </button>
@@ -311,7 +311,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
               <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "150ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-se-blue animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
-            <span className="font-display text-xs text-white/30">
+            <span className="font-display text-xs text-gray-400">
               {!narrationDone ? "Listening..." : "Preparing..."}
             </span>
           </div>

@@ -89,10 +89,11 @@ script/
 ## Brand / Design
 
 - **CDM Brand Colors**: Blue #1d88a9, Green #80ad40, Purple #785992, Brown #7c6752, Gray-Blue #54636c
+- **Theme**: White/light background with CDM brand accent colors; dark text (gray-800/700/600/500)
 - **Tailwind color prefix**: `se-` (e.g., `se-blue`, `se-green`, `se-purple`, `se-brown`, `se-grayblue`, `se-navy`, `se-cream`)
 - **Fonts**: Source Sans 3 (structural — sans, display, story), Devonshire (accent/decorative — `font-accent`)
 - **Google Fonts loaded in**: `client/index.html`
-- **CDM logo**: `client/public/cdm-logo.webp`
+- **CDM logo**: `client/public/cdm-logo.webp` (transparent background, works on white)
 
 ## Notes
 

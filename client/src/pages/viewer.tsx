@@ -33,7 +33,7 @@ export default function Viewer() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-se-navy flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-se-blue border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -41,8 +41,8 @@ export default function Viewer() {
 
   if (!sermon || !sermon.scenes) {
     return (
-      <div className="min-h-screen bg-se-navy flex flex-col items-center justify-center text-white">
-        <p className="text-white/60">Sermon not found</p>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <p className="text-gray-500">Sermon not found</p>
         <button onClick={() => setLocation("/")} className="mt-4 text-se-blue underline">Go back</button>
       </div>
     );
@@ -86,10 +86,9 @@ export default function Viewer() {
   }
 
   return (
-    <div className="min-h-screen bg-se-navy">
-      {/* Top Bar */}
+    <div className="min-h-screen bg-white">
       {phase !== "setup" && (
-        <div className="px-4 py-3 flex items-center justify-between sticky top-0 z-50 bg-se-navy/95 backdrop-blur-sm">
+        <div className="px-4 py-3 flex items-center justify-between sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
           <button
             onClick={() => {
               if (phase === "scene" && currentScene === 0) {
@@ -100,29 +99,28 @@ export default function Viewer() {
                 setPhase("scene");
               }
             }}
-            className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
 
-          {/* Progress bar */}
           <div className="flex-1 mx-4">
             <div className="flex items-center gap-1">
               {scenes.map((_: any, i: number) => (
                 <div
                   key={i}
                   className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                    i < currentScene ? "bg-se-blue" : i === currentScene ? "bg-se-green" : "bg-white/15"
+                    i < currentScene ? "bg-se-blue" : i === currentScene ? "bg-se-green" : "bg-gray-200"
                   }`}
                 />
               ))}
             </div>
-            <p className="text-white/40 text-[10px] text-center mt-1 font-display">
+            <p className="text-gray-400 text-[10px] text-center mt-1 font-display">
               Scene {currentScene + 1} of {totalScenes}
             </p>
           </div>
 
-          <div className="p-2 text-white/40">
+          <div className="p-2 text-gray-400">
             <BookOpen className="w-5 h-5" />
           </div>
         </div>
