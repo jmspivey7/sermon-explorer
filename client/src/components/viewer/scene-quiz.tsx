@@ -194,7 +194,7 @@ export default function SceneQuiz({ scene, ageGroup, onComplete, onSkip }: Props
             className="w-full py-2 text-center"
           >
             <span className="font-display text-xs text-gray-400 hover:text-gray-600 transition-colors">
-              Skip quiz
+              Skip to discussion
             </span>
           </button>
         )}

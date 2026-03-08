@@ -239,7 +239,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
           className="w-full mt-2 py-2 text-center"
         >
           <span className="font-display text-xs text-gray-400 hover:text-gray-600 transition-colors">
-            Skip to next
+            Skip to quiz
           </span>
         </button>
       </div>

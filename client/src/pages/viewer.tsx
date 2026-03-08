@@ -77,11 +77,17 @@ export default function Viewer() {
   }
 
   function handleSkipToNext() {
-    if (currentScene + 1 < totalScenes) {
-      setCurrentScene((prev) => prev + 1);
-      setPhase("scene");
-    } else {
-      setPhase("summary");
+    if (phase === "scene") {
+      setPhase("quiz");
+    } else if (phase === "quiz") {
+      setPhase("discussion");
+    } else if (phase === "discussion") {
+      if (currentScene + 1 < totalScenes) {
+        setCurrentScene((prev) => prev + 1);
+        setPhase("scene");
+      } else {
+        setPhase("summary");
+      }
     }
   }
 
@@ -169,7 +175,7 @@ export default function Viewer() {
               scene={scenes[currentScene]}
               ageGroup={ageGroup}
               onComplete={handleQuizComplete}
-              onSkip={handleDiscussionComplete}
+              onSkip={handleSkipToNext}
             />
           </motion.div>
         )}
@@ -184,6 +190,7 @@ export default function Viewer() {
             <DiscussionTime
               scene={scenes[currentScene]}
               onComplete={handleDiscussionComplete}
+              onSkip={handleSkipToNext}
               isLastScene={currentScene + 1 >= totalScenes}
             />
           </motion.div>

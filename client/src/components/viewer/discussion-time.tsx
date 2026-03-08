@@ -5,10 +5,11 @@ import { MessageCircle, ChevronRight, Heart, Users } from "lucide-react";
 interface Props {
   scene: any;
   onComplete: () => void;
+  onSkip: () => void;
   isLastScene: boolean;
 }
 
-export default function DiscussionTime({ scene, onComplete, isLastScene }: Props) {
+export default function DiscussionTime({ scene, onComplete, onSkip, isLastScene }: Props) {
   const rawPrompts = scene.discussionPrompts || [];
   const promptObjects = Array.isArray(rawPrompts) ? rawPrompts : (rawPrompts.prompts || []);
   const prompts = promptObjects.map((p: any) => (typeof p === "string" ? p : p.question || ""));
@@ -111,13 +112,22 @@ export default function DiscussionTime({ scene, onComplete, isLastScene }: Props
         whileTap={{ scale: 0.98 }}
         onClick={onComplete}
         className="w-full rounded-2xl p-4 bg-se-blue flex items-center justify-center gap-2
-                   hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20"
+                   hover:bg-se-blue/90 transition-all shadow-lg shadow-se-blue/20 mb-2"
       >
         <span className="font-display font-bold text-white text-sm">
           {isLastScene ? "See Your Results" : "Next Scene"}
         </span>
         <ChevronRight className="w-4 h-4 text-white" />
       </motion.button>
+
+      <button
+        onClick={onSkip}
+        className="w-full py-2 text-center"
+      >
+        <span className="font-display text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          Skip to next scene
+        </span>
+      </button>
     </div>
   );
 }
