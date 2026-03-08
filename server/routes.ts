@@ -381,24 +381,13 @@ Scripture: ${scene.scriptureRef || "none"}`,
 }
 
 async function generateImage(prompt: string, sermonId?: string, sceneIndex?: number): Promise<string> {
-  const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
-
-  try {
-    return await generateImageGemini(prompt, label, sermonId, sceneIndex);
-  } catch (err: any) {
-    console.warn(`Gemini Imagen failed for ${label}: ${err.message?.substring(0, 120)}`);
-    console.log(`Falling back to DALL-E 3 for ${label}`);
-    return await generateImageDallE(prompt, label, sermonId, sceneIndex);
-  }
-}
-
-async function generateImageGemini(prompt: string, label: string, sermonId?: string, sceneIndex?: number): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY not set");
+  if (!apiKey) throw new Error("GEMINI_API_KEY is required for image generation");
 
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
+  const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
   console.log(`Generating image with Imagen 4 for ${label}`);
 
   const maxRetries = 3;
@@ -430,48 +419,27 @@ async function generateImageGemini(prompt: string, label: string, sermonId?: str
         throw new Error("Imagen returned empty image data");
       }
 
-      return saveImageFile(Buffer.from(imageBytes, "base64"), sermonId, sceneIndex);
+      const filename = sermonId && sceneIndex !== undefined
+        ? `${sermonId}-scene${sceneIndex}.png`
+        : `image-${Date.now()}.png`;
+
+      const filePath = path.join(IMAGES_DIR, filename);
+      const buffer = Buffer.from(imageBytes, "base64");
+      fs.writeFileSync(filePath, buffer);
+      console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
+
+      return `/generated/images/${filename}`;
     } catch (err: any) {
       lastError = err;
-      if (err.status === 429) continue;
+      if (err.status === 429) {
+        console.warn(`Rate limited on attempt ${attempt + 1} for ${label}`);
+        continue;
+      }
       throw err;
     }
   }
 
   throw lastError;
-}
-
-async function generateImageDallE(prompt: string, label: string, sermonId?: string, sceneIndex?: number): Promise<string> {
-  console.log(`Generating image with DALL-E 3 for ${label}`);
-
-  const response = await openai.images.generate({
-    model: "dall-e-3",
-    prompt,
-    n: 1,
-    size: "1792x1024",
-    quality: "standard",
-  });
-
-  const imageUrl = response.data?.[0]?.url;
-  if (!imageUrl) throw new Error("DALL-E 3 returned no image URL");
-
-  const imageResponse = await fetch(imageUrl);
-  if (!imageResponse.ok) throw new Error(`Failed to download DALL-E image: ${imageResponse.status}`);
-  const buffer = Buffer.from(await imageResponse.arrayBuffer());
-
-  return saveImageFile(buffer, sermonId, sceneIndex);
-}
-
-function saveImageFile(buffer: Buffer, sermonId?: string, sceneIndex?: number): string {
-  const filename = sermonId && sceneIndex !== undefined
-    ? `${sermonId}-scene${sceneIndex}.png`
-    : `image-${Date.now()}.png`;
-
-  const filePath = path.join(IMAGES_DIR, filename);
-  fs.writeFileSync(filePath, buffer);
-  console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
-
-  return `/generated/images/${filename}`;
 }
 
 async function generateQuiz(content: string, ageGroup: string) {
