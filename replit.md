@@ -24,8 +24,7 @@ server/          - Express backend
   routes.ts      - API routes, AI processing pipeline, Gemini Imagen 3 image generation
   vite.ts        - Vite dev server middleware integration
   static.ts      - Static file serving for production
-shared/          - Shared types and demo data
-  demo-data.ts   - Pre-loaded demo sermon (Luke 11)
+shared/          - Shared types
 generated/       - Runtime-generated content
   images/        - Generated images from Gemini Imagen 3 (served via Express static)
 script/
@@ -54,7 +53,6 @@ script/
 - Auto-narration via TTS (model tts-1-hd, voice nova, speed 0.9) starts immediately when each scene appears
 - Three age groups: Young (4-6), Older (7-10), Family (11+)
 - Fixed bottom action bar with Next Scene / Skip buttons
-- Demo sermon pre-loaded (Luke 11:37-54)
 - In-memory sermon storage (no database)
 - Sermon deletion with image cleanup
 

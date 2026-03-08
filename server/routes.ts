@@ -6,7 +6,6 @@ import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
 import express from "express";
-import { DEMO_SERMON_DATA } from "@shared/demo-data";
 
 function getOpenAI(): OpenAI {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -19,8 +18,6 @@ const openai = new Proxy({} as OpenAI, {
 const upload = multer({ dest: "uploads/" });
 
 const processedSermons: Map<string, any> = new Map();
-
-processedSermons.set("demo-luke-11", DEMO_SERMON_DATA);
 
 const IMAGES_DIR = path.resolve("generated", "images");
 fs.mkdirSync(IMAGES_DIR, { recursive: true });
