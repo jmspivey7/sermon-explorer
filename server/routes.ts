@@ -512,7 +512,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
         : `Generate a wholesome children's storybook illustration, colorful 3D animated style, big-eyed characters, warm lighting, bright cheerful scene, family-friendly, widescreen 16:9, no text or writing, no depiction of Jesus or God as a person — use golden light rays instead. ${prompt.replace(/[^\w\s,.'"-]/g, ' ').substring(0, 500)}`;
 
       const response = await client.models.generateContent({
-        model: "gemini-2.5-flash-image",
+        model: "gemini-3-pro-image-preview",
         contents: currentPrompt,
         config: {
           responseModalities: ["TEXT", "IMAGE"],

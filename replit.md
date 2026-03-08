@@ -7,7 +7,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion + CDM Brand
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
-- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Gemini 2.5 Flash Image (native) for illustrations
+- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Gemini 3 Pro Image (native) for illustrations
 
 ## Project Structure
 
@@ -40,7 +40,7 @@ script/
 ## Environment Variables
 
 - `OPENAI_API_KEY` (secret) — Required for AI content generation (GPT-4o) and TTS narration
-- `GEMINI_API_KEY` (secret) — Required for image generation via Gemini 2.5 Flash Image (native)
+- `GEMINI_API_KEY` (secret) — Required for image generation via Gemini 3 Pro Image (native)
 
 ## Key Features
 
@@ -71,7 +71,7 @@ script/
 
 ## Image Generation (Gemini Native)
 
-- Uses `@google/genai` SDK: `client.models.generateContent()` with model `gemini-2.5-flash-image`
+- Uses `@google/genai` SDK: `client.models.generateContent()` with model `gemini-3-pro-image-preview`
 - Config: `{ responseModalities: ["TEXT", "IMAGE"] }`
 - Response: Find `inlineData` part in `response.candidates[0].content.parts` — base64-encoded image data
 - Safety prefix prepended to every prompt: child-safe settings, no Jesus/God figures, no text, no inappropriate content
