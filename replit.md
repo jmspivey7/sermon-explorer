@@ -7,7 +7,7 @@ A full-stack application that transforms sermon transcripts into animated, age-a
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Framer Motion + CDM Brand
 - **Backend**: Express.js (Node.js) + TypeScript
 - **Combined server**: Express serves both the API and the Vite dev middleware on port 5000
-- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Google Gemini Imagen 4 for illustrations
+- **AI**: OpenAI GPT-4o for content generation + TTS for narration, Gemini 2.5 Flash Image (native) for illustrations
 
 ## Project Structure
 
@@ -21,12 +21,12 @@ client/          - React frontend (Vite root)
   public/        - Static assets (cdm-logo.webp)
 server/          - Express backend
   index.ts       - Server entry point (port 5000, host 0.0.0.0)
-  routes.ts      - API routes, AI processing pipeline, Gemini Imagen 3 image generation
+  routes.ts      - API routes, AI processing pipeline, Gemini native image generation
   vite.ts        - Vite dev server middleware integration
   static.ts      - Static file serving for production
 shared/          - Shared types
 generated/       - Runtime-generated content
-  images/        - Generated images from Gemini Imagen 3 (served via Express static)
+  images/        - Generated images from Gemini native (served via Express static)
 script/
   build.ts       - Production build script
 ```
@@ -40,12 +40,12 @@ script/
 ## Environment Variables
 
 - `OPENAI_API_KEY` (secret) — Required for AI content generation (GPT-4o) and TTS narration
-- `GEMINI_API_KEY` (secret) — Required for image generation via Google Gemini Imagen 4
+- `GEMINI_API_KEY` (secret) — Required for image generation via Gemini 2.5 Flash Image (native)
 
 ## Key Features
 
 - Upload sermons as .docx, .pdf, or .txt files
-- AI pipeline: analyze → scene breakdown → age-adaptive narratives → Gemini Imagen 3 illustrations → quizzes → discussion prompts
+- AI pipeline: analyze → scene breakdown → age-adaptive narratives → Gemini native illustrations → quizzes → discussion prompts
 - Scene images displayed with Ken Burns CSS effects (zoom-in, zoom-out, pan-left, pan-right, fade) for cinematic animation feel
 - Colorful cinematic 3D animated style — no realistic rendering. No copyrighted characters or brands.
 - Never depicts God, Jesus, or the Holy Spirit — uses symbolic light/warmth instead
@@ -65,17 +65,19 @@ script/
 - `GET /api/sermons/:id/scenes/:sceneIndex` - Get individual scene data
 - `POST /api/upload` - Upload sermon file (.docx, .pdf, .txt)
 - `POST /api/tts` - Generate TTS audio
-- `POST /api/generate-image` - Generate image via Gemini Imagen 3
+- `POST /api/generate-image` - Generate image via Gemini native
 - `POST /api/generate-quiz` - Generate quiz questions
 - `GET /generated/images/*` - Serve generated image files
 
-## Image Generation (Gemini Imagen 4)
+## Image Generation (Gemini Native)
 
-- Uses `@google/genai` SDK: `client.models.generateImages()` with model `imagen-4.0-generate-001`
-- Config: `{ numberOfImages: 1, aspectRatio: "16:9" }`
-- Response: `response.generatedImages[0].image.imageBytes` — base64-encoded image data
+- Uses `@google/genai` SDK: `client.models.generateContent()` with model `gemini-2.5-flash-image`
+- Config: `{ responseModalities: ["TEXT", "IMAGE"] }`
+- Response: Find `inlineData` part in `response.candidates[0].content.parts` — base64-encoded image data
+- Safety prefix prepended to every prompt: child-safe settings, no Jesus/God figures, no text, no inappropriate content
 - Images saved locally to `generated/images/` as PNG files
 - URLs returned as `/generated/images/<sermonId>-scene<index>.png`
+- Retry logic: 3 attempts with exponential backoff; simplified prompt on retries
 
 ## Ken Burns CSS Effects
 

@@ -1,0 +1,25 @@
+Let me research the current Gemini native image generation API details.Good — I've got what I need. Here's the full picture:
+
+**You're right — that web UI is Google's "Nano Banana" native image generation.** It's the Gemini model generating images directly through `generateContent()`, not the separate Imagen API you're currently calling.
+
+Here's what the switch looks like:
+
+| | **Your current code (Imagen)** | **Nano Banana (Gemini native)** |
+|---|---|---|
+| SDK | `@google/genai` (already have it) | Same SDK — no change |
+| Method | `client.models.generateImages()` | `client.models.generateContent()` |
+| Model | `imagen-4.0-generate-001` | `gemini-2.0-flash-preview-image-generation` (or newer: `gemini-3.1-flash-image-preview`) |
+| Config | `numberOfImages`, `aspectRatio` | `responseModalities: ['TEXT', 'IMAGE']` |
+| Response | `response.generatedImages[0].image.imageBytes` | `response.candidates[0].content.parts` → find part with `inlineData` |
+
+The big advantage for your use case: because the full Gemini language model is interpreting your prompt (not just a raw image pipeline), it's much better at understanding nuanced safety instructions like "represent divine presence as warm golden light, not a human figure." It also tends to be less trigger-happy with safety rejections on innocent prompts.
+
+**You can absolutely switch.** Your `@google/genai` SDK and `GEMINI_API_KEY` work for both — it's just a different method call and model string. The response format changes (you look for `inlineData` in the response parts instead of `generatedImages`), but the rest of your pipeline (saving to PNG, serving the file) stays the same.
+
+Want me to build the updated `generateImage()` function with the Gemini native approach? I'd keep your retry logic and safety prefix intact, just swap the underlying engine.
+
+Sources:
+- [Nano Banana Image Generation - Google AI for Developers](https://ai.google.dev/gemini-api/docs/image-generation)
+- [Generate & Edit Images Using Gemini (Nano Banana) - Firebase](https://firebase.google.com/docs/ai-logic/generate-images-gemini)
+- [Gemini Image Editing Next.js Quickstart - GitHub](https://github.com/google-gemini/gemini-image-editing-nextjs-quickstart)
+- [Growing Image Generation with Gemini API - Medium](https://medium.com/google-cloud/growing-image-generation-with-gemini-api-python-and-node-js-now-supported-d8892d9a6466)

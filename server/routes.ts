@@ -285,19 +285,48 @@ RULE 3 — NO DUPLICATE OR REPETITIVE SCENES:
 - Before finalizing, review all scenes together and merge or replace any that overlap significantly.
 
 RULE 4 — IMAGE PROMPT RULES:
-- Style: Colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, like a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
-- NEVER depict God, Jesus, or the Holy Spirit as a character or figure. Use symbolic imagery: warm golden light, glowing clouds, radiant sunrise, guiding star, comforting glow.
-- Characters must NEVER have open mouths or appear to be speaking.
-- ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, LABELS, CAPTIONS, NAMES, OR WRITING OF ANY KIND in the image. Do not include character names, signs, banners, scrolls with writing, books with visible text, or any readable content. The image must be purely visual with zero text elements.
-- Each scene's image must visually connect to the sermon content and feel consistent with the other scenes' art style and setting.
 
-RULE 5 — CONTENT SAFETY (MANDATORY — ZERO TOLERANCE):
-- ABSOLUTELY NO alcohol, beer, wine, liquor, bottles, glasses of alcohol, bars, pubs, taverns, drinking establishments, cocktails, or any beverage that could be interpreted as alcoholic.
-- ABSOLUTELY NO drugs, drug paraphernalia, smoking, cigarettes, vaping, pills, syringes, or substance use.
-- ABSOLUTELY NO gambling: no poker chips, playing cards used for gambling, slot machines, dice games, casino imagery, or betting.
-- ABSOLUTELY NO weapons, violence, blood, gore, or frightening imagery.
-- Even if the sermon DIRECTLY discusses alcohol, gambling, addiction, or sin — the image prompt must NEVER depict these literally. Instead use child-safe metaphors: a child choosing between two paths (bright vs. dark), a stormy sea becoming calm, a wilting flower being restored, a lost sheep being found, etc.
-- All imagery must be appropriate for children ages 4-12.
+STYLE:
+- Colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, like a modern family animated feature film (Pixar/DreamWorks quality). NOT realistic, NOT watercolor, NOT cartoon.
+- Warm cinematic lighting. Widescreen 16:9. Rich environmental detail.
+- No copyrighted characters, no recognizable brands.
+
+ABSOLUTE PROHIBITIONS (ZERO TOLERANCE):
+- NEVER depict God, Jesus, or the Holy Spirit as a person, figure, silhouette, shadow, or character. Not from behind. Not obscured. Not as light in human form. NEVER. Instead: warm golden light rays from above, a glowing cloud, a radiant sunrise, a gentle star, a comforting glow filling a room. The EFFECT of God's presence, never a figure.
+- NEVER depict: alcohol, beer, wine, liquor, any drinking vessel that could be interpreted as containing alcohol, bars, pubs, taverns, toasting, clinking glasses.
+- NEVER depict: drugs, pills, syringes, smoking, vaping, cigarettes, any substance or paraphernalia.
+- NEVER depict: gambling, poker chips, dice, slot machines, playing cards used for gambling, casinos, betting.
+- NEVER depict: weapons, swords, spears, knives, bows, shields in combat, violence, blood, injury, death, graves, skeletons, skulls, war scenes, battles.
+- NEVER depict: romantic scenes, kissing, intimate situations, suggestive clothing or poses.
+- NEVER depict: scary imagery, monsters, demons, dark threatening figures, fire as punishment, hell imagery.
+- NEVER include text, words, letters, numbers, labels, captions, names, signs, banners, scrolls with writing, books with visible text, or any readable content.
+- Characters must NEVER have open mouths or appear to be speaking or shouting.
+
+METAPHOR MAPPING (CRITICAL):
+When the sermon discusses adult topics, the image prompt must use a child-safe visual metaphor instead of depicting the topic literally:
+- Sin/wrongdoing -> A child at a fork between a bright sunny path and a dark shadowy path
+- Addiction/temptation -> A child being gently pulled toward a warm light while shadows recede behind them
+- Hypocrisy -> A shiny apple that is rotten inside (cut in half), or a beautiful cup that is dirty inside
+- Judgment/condemnation -> Heavy stone blocks on someone's shoulders while others watch with crossed arms
+- Forgiveness/grace -> A wilted flower being restored by warm golden rain, or a dark room filling with sunrise light
+- Death/loss -> An empty chair with a warm light shining on it, or a bird flying into golden clouds
+- Anger/conflict -> Storm clouds breaking apart to reveal blue sky and a rainbow
+- Greed/selfishness -> A child hoarding toys in a corner while other children play together happily
+- Repentance -> A child turning around on a dark path to face a warm, glowing light
+
+SETTING RULES:
+- Default to biblical-era settings: stone villages, olive groves, hillsides, temple courtyards, simple homes with oil lamps, dusty roads, fishing boats, marketplaces.
+- If the pastor used a modern real-world illustration, 1-2 scenes (10-20%) may use modern settings (classroom, family dinner table, playground, living room). These must still follow ALL prohibitions above.
+- Characters should be diverse in ethnicity and appearance.
+- Include children in scenes where appropriate.
+
+EACH IMAGE PROMPT MUST END WITH:
+"No text, no words, no letters, no writing of any kind. No depiction of God or Jesus as a figure. No alcohol, drugs, gambling, weapons, violence, or scary imagery. Suitable for ages 4-12."
+
+RULE 5 — CONTENT FIELD:
+- content: The core teaching content (2-3 paragraphs). This is the RAW source material that will be rewritten into age-appropriate narratives. It should contain the key facts, names, places, actions, and lessons from this portion of the sermon. Include specific details that quiz questions can be built from.
+- Write the content in plain, clear language. Avoid theological jargon. If a theological concept appears (e.g., tithing, Pharisee, repentance), include a brief parenthetical explanation: "the Pharisees (the religious leaders who followed every rule very carefully)".
+- Each scene's content must use transitional language connecting to the previous scene. NEVER restart or re-introduce the topic as if starting over.
 
 RULE 6 — REAL-WORLD ILLUSTRATIONS:
 - If the pastor used a memorable real-world example or personal story, 1-2 scenes (10-20%) should depict that modern-day scenario. These must still follow all safety rules above.
@@ -305,11 +334,11 @@ RULE 6 — REAL-WORLD ILLUSTRATIONS:
 
 For each scene, provide:
 - title: A short, engaging scene title
-- content: The core teaching content (2-3 paragraphs). Must use transitional language connecting to the previous scene.
+- content: The core teaching content following Rule 5 above
 - scriptureRef: Any Bible verse referenced
 - keyPoint: The single most important idea
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A detailed prompt following ALL image rules above. Must specify: colorful cinematic 3D animated style, expressive big-eyed characters, soft global lighting, warm cinematic lighting, widescreen 16:9, rich detail. Must explicitly state "no text, no words, no letters, no writing of any kind in the image." Must explicitly state "no alcohol, no gambling, no drugs, no weapons."
+- imagePrompt: A detailed prompt following ALL image rules above
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -344,18 +373,19 @@ RULES:
 1. SERMON ORDER: Follow the exact sequence the sermon was preached. No rearranging.
 2. CONTINUOUS FLOW: Each scene builds on the previous one with transitional language. Never restart or re-introduce topics.
 3. NO DUPLICATES: Every scene must cover distinct content. No two scenes should teach the same concept.
-4. IMAGE SAFETY (ZERO TOLERANCE): ABSOLUTELY NO alcohol, beer, wine, liquor, bars, pubs, drugs, smoking, gambling, poker chips, weapons, violence in image prompts. For adult sermon topics, use child-safe metaphors (a bright path vs. dark path, a calm sea after a storm, etc.).
+4. IMAGE SAFETY (ZERO TOLERANCE): ABSOLUTELY NO alcohol, beer, wine, liquor, bars, pubs, drugs, smoking, gambling, poker chips, weapons, violence, romantic scenes, scary imagery in image prompts. NEVER depict God, Jesus, or the Holy Spirit as a person, figure, silhouette, or shadow in any way. Use symbolic light/warmth only. For adult sermon topics, use child-safe metaphors (a bright path vs. dark path, a calm sea after a storm, a dirty cup vs. clean cup, etc.).
 5. NO TEXT IN IMAGES: ABSOLUTELY NO text, words, letters, numbers, names, labels, signs, banners, or writing of any kind in image prompts. Images must be purely visual.
-6. STYLE: Colorful cinematic 3D animated style, like a modern family animated feature film (NOT realistic). No copyrighted characters. NEVER depict God/Jesus/Holy Spirit — use symbolic light/warmth. No open mouths on characters.
+6. STYLE: Colorful cinematic 3D animated style, like a modern family animated feature film (NOT realistic). No copyrighted characters. No open mouths on characters.
 7. REAL-WORLD ILLUSTRATIONS: If the pastor used real-world examples, 1-2 scenes may depict those in modern-day settings (following all safety rules). Otherwise use biblical settings.
+8. EACH IMAGE PROMPT MUST END WITH: "No text, no words, no letters, no writing of any kind. No depiction of God or Jesus as a figure. No alcohol, drugs, gambling, weapons, violence, or scary imagery. Suitable for ages 4-12."
 
 For each scene, provide:
 - title: A short, engaging scene title
-- content: The core teaching content of this scene (1-2 paragraphs). Must use transitions connecting to previous scene.
+- content: The core teaching content (1-2 paragraphs). Plain language. If theological terms appear, include brief explanations. Must use transitions connecting to previous scene.
 - scriptureRef: Any Bible verse referenced in this section
 - keyPoint: The single most important idea in this scene
 - emotion: The emotional tone (joy, wonder, conviction, comfort, etc.)
-- imagePrompt: A prompt for a colorful cinematic 3D animated style illustration with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. Warm cinematic lighting. No copyrighted characters or recognizable brands. No text. Never depict God or Jesus — use symbolic light. No open mouths. Widescreen 16:9 with rich detail. Use modern-day setting for scenes based on pastor's real-world stories; biblical setting for all others.
+- imagePrompt: A prompt following all rules above. Colorful cinematic 3D animated style, expressive big-eyed characters, soft global lighting, warm cinematic lighting, widescreen 16:9, rich detail.
 - animationHint: "zoom-in", "pan-left", "pan-right", "zoom-out", or "fade"
 
 Respond with JSON: { "scenes": [...] }`,
@@ -389,21 +419,53 @@ async function generateNarratives(scene: any, sceneIndex: number = 0, totalScene
     messages: [
       {
         role: "system",
-        content: `You create age-appropriate retellings of sermon scenes that flow as part of ONE CONTINUOUS STORY. This scene is part of a larger storybook — your narration should feel like the next chapter, not a fresh start.
+        content: `You are a warm, experienced Sunday school teacher retelling a Bible story to children gathered around you. You are sitting on the floor with them. You have a quilt and a story bag. The children are settled in, looking at you, ready to hear the next part of the story.
+
+HOW YOU SPEAK:
+- You talk TO children, not ABOUT theology.
+- You start with something they already know. Every scene opens by connecting to a child's real experience before introducing the Bible content. Examples: "Have you ever had an itchy rash?" "Imagine you found a key that opened a special door." "Have you ever been at a dinner where someone said something surprising?"
+- You use short, active sentences. Subject-verb-object. "Jesus looked at the men. He saw their sores and bumps." NOT: "Jesus, observing their condition with compassion, recognized the severity of their ailment."
+- You name things concretely. Say "sores and bumps" not "affliction." Say "the leaders" not "religious authorities." Say "they got really mad" not "they responded with hostility."
+- You use repetition for emphasis, the way a teacher does: "Ten men. Ten sick men. And Jesus healed them all."
+- You land every scene on ONE simple sentence the child can remember. Not a paragraph. One sentence.
+- You never use words a 5-year-old wouldn't understand in the young tier, or words a 9-year-old wouldn't understand in the older tier.
+
+WHAT YOU NEVER DO:
+- Never use abstract theological language in young or older tiers. No: "genuine relationship with God," "external compliance," "religious pretense," "spiritual transformation," "deliberate confrontation," "sacrificial integrity."
+- Never start a narration with a summary or thesis statement. Start with a scene. Start with a moment. Start with a question.
+- Never preach at the child. The story teaches. You tell the story.
+- Never use passive voice. "The men were healed" becomes "Jesus healed the men."
+- Never reference the sermon, the pastor, or the app itself. You are telling a Bible story, not summarizing a sermon.
+
+Write THREE versions of this scene:
+
+1. "young" (ages 4-6):
+   - Open with something the child already knows (a feeling, an everyday experience, a simple question).
+   - Use 5-7 short, active sentences. Subject-verb-object.
+   - Name things concretely: "sores and bumps" not "affliction," "the leaders" not "religious authorities."
+   - Use "Jesus" by name. Use "God" by name. Children need to hear these names attached to actions.
+   - End with ONE simple takeaway sentence a child could repeat back to you. Example: "God takes care of us, even when we forget to say thank you."
+   - FORBIDDEN WORDS for this tier: mission, genuine, external, compliance, transformation, relationship (with God), deliberate, confrontation, pretense, sacrificial, integrity, authentic, theological, profound, challenged, navigate, recognized, observed, demonstrated, ultimately, significantly.
+   - Read your output aloud in your head. If it sounds like a textbook, rewrite it. It should sound like a person talking to a small child.
+
+2. "older" (ages 7-10):
+   - Open with a relatable comparison or scenario the child can picture.
+   - 6-8 sentences. Can use simple metaphors.
+   - Can include scripture references naturally in the story: "The Bible tells us in Luke 11..."
+   - Include enough specific detail (names, places, actions) that quiz questions can be answered from this text alone.
+   - End with a clear lesson stated simply. One or two sentences.
+   - Avoid: "genuine relationship," "external compliance," "religious pretense," "spiritual transformation."
+
+3. "family" (ages 11+/parents):
+   - Full depth of the teaching. Can reference theology.
+   - 7-10 sentences.
+   - Written for parents who may not know the Bible well. Explain context they'd need. Don't assume familiarity with Pharisees, tithing, or temple customs without a brief, natural explanation.
+   - Connect the ancient world to the modern world. What does this look like in a family's life today?
+   - End with a forward-looking statement, not a summary.
 
 CRITICAL FLOW RULES:
-- Write as if continuing an ongoing story. Use language that builds on what came before.
-- NEVER re-introduce the topic or start from scratch. Assume the reader has already read the previous scenes.
-- Use transitional phrasing where appropriate: "As the story continues...", "Next...", "Then...", "Building on what we just learned...", etc.
-- The narration should feel like turning the page of a storybook, not starting a new book.
-
-For each scene, write THREE versions:
-
-1. "young" (ages 4-6): Use simple, clear language but DO NOT oversimplify to the point of losing the story. Write 5-7 sentences. Include the key names, places, and events from the scene. Use concrete images and comparisons kids can understand. Tell enough of the story that a child can follow what happened, who was involved, and what the lesson was. No abstract theology, but don't strip out all the detail either.
-2. "older" (ages 7-10): More detailed retelling. Can handle basic metaphors. 6-8 sentences. Include scripture references when relevant. Walk through the scene's content step by step.
-3. "family" (ages 11+/adults): Full depth of the teaching. Can reference theology. 7-10 sentences. This should help parents who may not be Bible-literate understand the sermon point clearly and discuss it with their family.
-
-Each version should cover the same content from the scene but at the right reading level. Be warm, never scary. Make sure each version includes enough specific detail (names, places, events, lessons) that quiz questions can be asked about it.
+- If this is scene 2 or later, do NOT re-introduce the overall topic. Continue the story. Use transitions: "Next..." "As the story continues..." "Then something surprising happened..."
+- The opening hook (connecting to the child's experience) should still appear, but it connects to THIS scene's specific content, not to the sermon's overall theme.
 
 Respond with JSON: { "young": "...", "older": "...", "family": "..." }`,
       },
@@ -429,11 +491,11 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
-  const safetyPrefix = "Children's storybook illustration for ages 4-12. The scene must be entirely wholesome, bright, cheerful, and family-friendly. Only include child-safe settings like gardens, villages, fields, temples, homes, paths, hillsides, or classrooms. The image must contain zero text, zero words, zero letters, zero numbers, zero writing of any kind. Do not depict Jesus, God, or any divine figure as a person or character. Instead, represent divine presence only through symbolic imagery such as warm golden light rays, glowing clouds, a radiant sunrise, or a gentle comforting glow. ";
+  const safetyPrefix = "Generate a bright, cheerful children's storybook illustration for ages 4-12. Colorful 3D animated style with expressive big-eyed characters and soft global lighting, like a modern family animated feature film. The scene must be entirely wholesome and family-friendly. CRITICAL RULES: Do not depict Jesus, God, or any divine figure as a person or character in any way — no silhouettes, no figures, no human forms, not from behind, not obscured. Represent divine presence ONLY through warm golden light rays, glowing clouds, or gentle radiant sunrise. Do not include any text, words, letters, numbers, or writing of any kind anywhere in the image. Characters must have closed mouths. Settings must be child-safe. Widescreen 16:9 composition. ";
   const safePrompt = safetyPrefix + prompt;
 
   const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
-  console.log(`Generating image with Imagen 4 for ${label}`);
+  console.log(`Generating image with Gemini native for ${label}`);
 
   const maxRetries = 3;
   let lastError: any;
@@ -447,28 +509,32 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
       }
 
       const currentPrompt = attempt === 0 ? safePrompt
-        : `Wholesome children's storybook illustration, colorful 3D animated style, big-eyed characters, warm lighting, bright cheerful scene, family-friendly, widescreen 16:9, no text or writing. ${prompt.replace(/[^\w\s,.'"-]/g, ' ').substring(0, 500)}`;
+        : `Generate a wholesome children's storybook illustration, colorful 3D animated style, big-eyed characters, warm lighting, bright cheerful scene, family-friendly, widescreen 16:9, no text or writing, no depiction of Jesus or God as a person — use golden light rays instead. ${prompt.replace(/[^\w\s,.'"-]/g, ' ').substring(0, 500)}`;
 
-      const response = await client.models.generateImages({
-        model: "imagen-4.0-generate-001",
-        prompt: currentPrompt,
+      const response = await client.models.generateContent({
+        model: "gemini-2.5-flash-image",
+        contents: currentPrompt,
         config: {
-          numberOfImages: 1,
-          aspectRatio: "16:9",
+          responseModalities: ["TEXT", "IMAGE"],
         },
       });
 
-      if (!response.generatedImages || response.generatedImages.length === 0) {
+      const parts = response.candidates?.[0]?.content?.parts;
+      if (!parts || parts.length === 0) {
         if (attempt < maxRetries - 1) {
-          console.warn(`Imagen safety filter likely blocked prompt for ${label}, will retry with simplified prompt`);
+          console.warn(`Gemini returned no parts for ${label}, will retry with simplified prompt`);
           continue;
         }
-        throw new Error("Imagen returned no images — prompt may have been blocked by safety filter");
+        throw new Error("Gemini returned no content parts");
       }
 
-      const imageBytes = response.generatedImages[0].image?.imageBytes;
-      if (!imageBytes) {
-        throw new Error("Imagen returned empty image data");
+      const imagePart = parts.find((p: any) => p.inlineData?.mimeType?.startsWith("image/"));
+      if (!imagePart?.inlineData?.data) {
+        if (attempt < maxRetries - 1) {
+          console.warn(`Gemini returned no image data for ${label}, will retry with simplified prompt`);
+          continue;
+        }
+        throw new Error("Gemini returned no image in response");
       }
 
       const filename = sermonId && sceneIndex !== undefined
@@ -476,7 +542,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
         : `image-${Date.now()}.png`;
 
       const filePath = path.join(IMAGES_DIR, filename);
-      const buffer = Buffer.from(imageBytes, "base64");
+      const buffer = Buffer.from(imagePart.inlineData.data, "base64");
       fs.writeFileSync(filePath, buffer);
       console.log(`Image saved: ${filePath} (${(buffer.length / 1024).toFixed(0)}KB)`);
 
@@ -485,6 +551,10 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
       lastError = err;
       if (err.status === 429) {
         console.warn(`Rate limited on attempt ${attempt + 1} for ${label}`);
+        continue;
+      }
+      if (attempt < maxRetries - 1 && err.message?.includes("safety")) {
+        console.warn(`Safety filter hit for ${label}, will retry with simplified prompt`);
         continue;
       }
       throw err;
@@ -500,11 +570,37 @@ async function generateQuiz(content: string, ageGroup: string) {
     messages: [
       {
         role: "system",
-        content: `Create quiz questions about a storybook scene for families. You will be given the EXACT narration text that the reader saw/heard. Your questions MUST be answerable ONLY from the information explicitly stated in that narration text.
+        content: `Create quiz questions about a storybook scene for families. You will be given the EXACT narration text that the reader saw and heard. Your questions MUST be answerable ONLY from the information explicitly stated in that narration.
 
-CRITICAL RULE: Every question's correct answer must come directly from a specific fact, name, place, action, or lesson that is EXPLICITLY mentioned in the narration text provided. If a detail is NOT stated in the narration, you MUST NOT ask about it. Do NOT use your own biblical knowledge to fill in gaps — only test what the storybook actually taught.
+CRITICAL RULE: Every correct answer must come directly from a specific fact, name, place, action, or lesson that is EXPLICITLY mentioned in the narration. If a detail is NOT stated, do NOT ask about it. Do not use your own biblical knowledge to fill gaps.
 
 Before writing each question, mentally verify: "Can I point to the exact sentence in the narration that provides this answer?" If not, discard it and write a different question.
+
+QUESTION STYLE (modeled on Sunday school curriculum):
+
+"young" questions (ages 4-6):
+  - Simple Yes/No format. Options: ["Yes", "No"].
+  - Frame as something the child just heard in the story: "Did Jesus heal the sick men?" "Did the man say thank you?"
+  - Language a 4-year-old can understand. No compound sentences.
+  - Explanation should sound like a teacher talking to a child: "That's right! Jesus healed all 10 men because he loved them."
+  - Base these on the "Young version" narration.
+
+"older" questions (ages 7-10):
+  - Multiple choice with 3 text options.
+  - Start with factual recall, then one application question: "What did Jesus tell the men to do?" "Why do you think the one man came back?"
+  - Explanation should teach, not just confirm: "Jesus told them to go show themselves to the priests. In Bible times, the priests were the ones who decided if someone was healed."
+  - Base these on the "Older version" narration.
+
+"family" questions (ages 11+):
+  - Multiple choice with 3 text options.
+  - Can be reflective and application-focused: "What does this scene teach about how God sees us?"
+  - Explanation should connect to modern life.
+  - Base these on the "Family version" narration.
+
+ALL questions must be answerable from the narration text alone. NEVER ask about details not explicitly covered in the narration.
+NEVER reference images, pictures, illustrations, or visual elements.
+NEVER reference "which picture" or "which image" or ask users to compare visual options.
+Explanations should reinforce the lesson by quoting or paraphrasing what the narration actually said.
 
 Respond with JSON:
 {
@@ -513,22 +609,13 @@ Respond with JSON:
       "question": "...",
       "options": ["A", "B", "C"],
       "correctIndex": 0,
-      "explanation": "A brief, encouraging explanation that references what the narration said",
+      "explanation": "...",
       "ageGroup": "young" | "older" | "family"
     }
   ]
 }
 
-Create 2 questions for each age group (6 total).
-
-QUESTION STYLE RULES:
-- "young" questions (ages 4-6): Use simple Yes/No format with options ["Yes", "No"]. Frame the question so "Yes" or "No" is the answer. NEVER use "True/False". Keep language very simple. Base these on the "Young version" narration.
-- "older" questions (ages 7-10): Multiple choice with 3 text options. Questions should be straightforward and age-appropriate. Base these on the "Older version" narration.
-- "family" questions (ages 11+): Multiple choice with 3 text options. Can be deeper and more reflective. Base these on the "Family version" narration.
-- ALL questions must be answerable from the narration text alone. NEVER ask about details not explicitly covered in the narration.
-- NEVER reference images, pictures, illustrations, or visual elements.
-- NEVER reference "which picture" or "which image" or ask users to compare visual options.
-- Explanations should reinforce the lesson by quoting or paraphrasing what the narration actually said.`,
+Create 2 questions for each age group (6 total).`,
       },
       { role: "user", content: content },
     ],
@@ -544,20 +631,34 @@ async function generateDiscussionPrompts(scene: any) {
     messages: [
       {
         role: "system",
-        content: `Create family discussion prompts for a sermon scene. These should help parents and children talk about the sermon together at home.
+        content: `Create family discussion prompts for a storybook scene. These help parents and children talk about the story together.
+
+MODEL: Follow the pattern from Sunday school curriculum:
+
+1. Start with a simple recall question about the story: "What did Jesus do for the sick men?"
+
+2. Then an application question connecting to the child's life: "What are some ways God shows love and care for us?"
+
+3. Include a parentTip that tells the parent HOW to respond, modeling the kind of warm, affirming answer a Sunday school teacher would give. Example: "After they share, you can say: 'Yes! God shows his love in so many ways. He gives us families, friends, food, and most of all, he sent Jesus.'"
+
+TONE RULES:
+- Questions should be simple enough that a 5-year-old could attempt an answer, even if the family is in "family" mode.
+- Parent tips should give the parent actual words to say, not abstract advice like "guide the conversation." Write out example sentences the parent can use.
+- connectionToLife should name a specific, concrete action: "At bedtime tonight, pray together and thank God for three specific things" NOT "Practice gratitude as a family."
+- Never assume the parent is Bible-literate. Explain any biblical context they'd need right in the parentTip.
 
 Respond with JSON:
 {
   "prompts": [
     {
       "question": "An open-ended question for family discussion",
-      "parentTip": "A brief tip to help parents guide the conversation",
-      "connectionToLife": "How this connects to everyday family life"
+      "parentTip": "Actual words and sentences the parent can say, not abstract advice",
+      "connectionToLife": "A specific, concrete action the family can take this week"
     }
   ]
 }
 
-Create 2-3 prompts per scene. Make them practical, warm, and accessible to parents who may not be deeply Bible-literate.`,
+Create 2-3 prompts per scene.`,
       },
       {
         role: "user",
