@@ -267,7 +267,12 @@ async function generateScenes(text: string, analysis: any) {
     messages: [
       {
         role: "system",
-        content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
+        content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 8-10 visual scenes that follow the sermon IN THE EXACT ORDER it was preached.
+
+SERMON ORDER RULE (MOST IMPORTANT):
+- Scenes MUST follow the sermon's actual sequence from beginning to end. Scene 1 covers the opening of the sermon, scene 2 covers what comes next, and so on through to the conclusion.
+- Do NOT rearrange, regroup, or reorder the sermon's content for dramatic effect. The storybook should walk the reader through the sermon in the same order the pastor delivered it.
+- Each scene should correspond to the next sequential section of the sermon text. If the pastor started with a story, then moved to a scripture, then gave an illustration, the scenes should follow that same progression.
 
 CRITICAL STYLE AND CONTENT RULES:
 - All visuals must be in a colorful, cinematic 3D animated style with expressive, big-eyed characters and soft global lighting, similar to a modern family animated feature film. NOT realistic, NOT watercolor. No copyrighted characters or recognizable brands.
@@ -313,7 +318,9 @@ ${text.substring(0, 12000)}`,
       messages: [
         {
           role: "system",
-          content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes. Each scene should be a self-contained moment that can be illustrated and narrated.
+          content: `You are a creative director turning a sermon into an illustrated storybook. Break the sermon into 5-6 visual scenes that follow the sermon IN THE EXACT ORDER it was preached.
+
+SERMON ORDER RULE (MOST IMPORTANT): Scenes MUST follow the sermon's actual sequence from beginning to end. Do NOT rearrange or reorder content. Each scene should correspond to the next sequential section of the sermon.
 
 CRITICAL RULES: Colorful cinematic 3D animated style only, like a modern family animated feature film (NOT realistic). No copyrighted characters or recognizable brands. NEVER depict God, Jesus, or the Holy Spirit — use symbolic light/warmth instead. No open mouths on characters.
 
@@ -359,13 +366,15 @@ async function generateNarratives(scene: any) {
     messages: [
       {
         role: "system",
-        content: `You create age-appropriate retellings of sermon scenes. For each scene, write THREE versions:
+        content: `You create age-appropriate retellings of sermon scenes. The scene content you receive follows the actual order of the sermon as it was preached. Your narration should preserve this order and context — walk the reader through what the pastor taught in the sequence it was delivered.
 
-1. "young" (ages 4-6): Very simple sentences. Use concrete images. 3-4 sentences max. No abstract theology.
-2. "older" (ages 7-10): Simple but more detailed. Can handle basic metaphors. 4-6 sentences.
-3. "family" (ages 11+/adults): Full depth of the teaching. Can reference theology. 5-8 sentences. This should help parents who may not be Bible-literate understand the sermon point clearly.
+For each scene, write THREE versions:
 
-Each version should tell the same story but at the right level. Be warm, never scary.
+1. "young" (ages 4-6): Use simple, clear language but DO NOT oversimplify to the point of losing the story. Write 5-7 sentences. Include the key names, places, and events from the scene. Use concrete images and comparisons kids can understand. Tell enough of the story that a child can follow what happened, who was involved, and what the lesson was. No abstract theology, but don't strip out all the detail either.
+2. "older" (ages 7-10): More detailed retelling. Can handle basic metaphors. 6-8 sentences. Include scripture references when relevant. Walk through the scene's content step by step.
+3. "family" (ages 11+/adults): Full depth of the teaching. Can reference theology. 7-10 sentences. This should help parents who may not be Bible-literate understand the sermon point clearly and discuss it with their family.
+
+Each version should cover the same content from the scene but at the right reading level. Be warm, never scary. Make sure each version includes enough specific detail (names, places, events, lessons) that quiz questions can be asked about it.
 
 Respond with JSON: { "young": "...", "older": "...", "family": "..." }`,
       },
