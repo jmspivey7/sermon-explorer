@@ -46,8 +46,7 @@ export default function Home() {
             <span className="font-accent text-xl">Sunday's Sermon, Brought to Life</span>
           </p>
           <p className="text-gray-500 text-sm max-w-md mx-auto">
-            Interactive illustrated storybooks that transform weekly sermons into
-            engaging family experiences for all ages
+            Interactive, illustrated storybooks that transform weekly sermons into engageing family experiences for all ages.
           </p>
         </motion.button>
 
@@ -67,7 +66,7 @@ export default function Home() {
           </p>
           <p className="text-gray-500 text-sm max-w-md mx-auto">
             Interactive training to explain and explore the essential elements
-            of corporate worship for young people
+            of corporate worship for young people.
           </p>
         </motion.div>
       </div>
