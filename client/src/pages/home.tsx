@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { BookOpen, Upload, ChevronRight } from "lucide-react";
+import { BookOpen, Upload, ChevronRight, ShieldCheck } from "lucide-react";
 const cdmLogo = "/cdm-logo.webp";
 
 export default function Home() {
@@ -90,21 +90,42 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Upload Button */}
+      {/* Admin Divider */}
+      <div className="max-w-lg mx-auto px-6 pt-6 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex items-center gap-2 text-white/30">
+            <ShieldCheck className="w-4 h-4" />
+            <span className="font-display text-xs font-semibold uppercase tracking-wider">Admin</span>
+          </div>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+      </div>
+
+      {/* Admin Section */}
       <div className="max-w-lg mx-auto px-6 pb-16">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setLocation("/upload")}
-          className="w-full bg-se-teal/20 border-2 border-dashed border-se-teal/40 rounded-2xl p-5
-                     flex items-center justify-center gap-3
-                     hover:bg-se-teal/30 hover:border-se-teal/60 transition-all"
-        >
-          <Upload className="w-5 h-5 text-se-teal" />
-          <span className="font-display font-bold text-se-teal">
-            Upload New Sermon
-          </span>
-        </motion.button>
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+          <p className="text-white/40 text-xs font-display mb-4">
+            The tools below are available to church administrators for managing sermon content.
+          </p>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setLocation("/upload")}
+            className="w-full bg-se-teal/15 border border-se-teal/30 rounded-xl p-4
+                       flex items-center gap-3
+                       hover:bg-se-teal/25 hover:border-se-teal/50 transition-all"
+          >
+            <div className="w-10 h-10 rounded-lg bg-se-teal/20 flex items-center justify-center flex-shrink-0">
+              <Upload className="w-5 h-5 text-se-teal" />
+            </div>
+            <div className="text-left">
+              <span className="font-display font-bold text-se-teal text-sm block">Upload New Sermon</span>
+              <span className="text-white/40 text-xs">Process a transcript into an interactive storybook</span>
+            </div>
+          </motion.button>
+        </div>
       </div>
 
       {/* Footer */}
