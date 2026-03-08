@@ -429,7 +429,7 @@ async function generateImage(prompt: string, sermonId?: string, sceneIndex?: num
   const { GoogleGenAI } = await import("@google/genai");
   const client = new GoogleGenAI({ apiKey });
 
-  const safetyPrefix = "Children's storybook illustration for ages 4-12. The scene must be entirely wholesome, bright, cheerful, and family-friendly. Only include child-safe settings like gardens, villages, fields, temples, homes, paths, hillsides, or classrooms. The image must contain zero text, zero words, zero letters, zero numbers, zero writing of any kind. ";
+  const safetyPrefix = "Children's storybook illustration for ages 4-12. The scene must be entirely wholesome, bright, cheerful, and family-friendly. Only include child-safe settings like gardens, villages, fields, temples, homes, paths, hillsides, or classrooms. The image must contain zero text, zero words, zero letters, zero numbers, zero writing of any kind. Do not depict Jesus, God, or any divine figure as a person or character. Instead, represent divine presence only through symbolic imagery such as warm golden light rays, glowing clouds, a radiant sunrise, or a gentle comforting glow. ";
   const safePrompt = safetyPrefix + prompt;
 
   const label = `${sermonId || "on-demand"} scene ${sceneIndex ?? "?"}`;
