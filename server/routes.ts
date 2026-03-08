@@ -222,7 +222,10 @@ async function processSermon(sermonId: string, text: string) {
 
   updateProgress("Creating quizzes and discussion prompts...", 80);
   for (let i = 0; i < scenes.length; i++) {
-    const quiz = await generateQuiz(scenes[i].content, "mixed");
+    const narrativeText = scenes[i].narratives
+      ? `Young version: ${scenes[i].narratives.young}\n\nOlder version: ${scenes[i].narratives.older}\n\nFamily version: ${scenes[i].narratives.family}`
+      : scenes[i].content;
+    const quiz = await generateQuiz(narrativeText, "mixed");
     scenes[i].quiz = quiz;
     const discussion = await generateDiscussionPrompts(scenes[i]);
     scenes[i].discussionPrompts = discussion;
@@ -448,7 +451,11 @@ async function generateQuiz(content: string, ageGroup: string) {
     messages: [
       {
         role: "system",
-        content: `Create quiz questions about a sermon scene for families. Generate questions at multiple levels.
+        content: `Create quiz questions about a storybook scene for families. You will be given the EXACT narration text that the reader saw/heard. Your questions MUST be answerable ONLY from the information explicitly stated in that narration text.
+
+CRITICAL RULE: Every question's correct answer must come directly from a specific fact, name, place, action, or lesson that is EXPLICITLY mentioned in the narration text provided. If a detail is NOT stated in the narration, you MUST NOT ask about it. Do NOT use your own biblical knowledge to fill in gaps — only test what the storybook actually taught.
+
+Before writing each question, mentally verify: "Can I point to the exact sentence in the narration that provides this answer?" If not, discard it and write a different question.
 
 Respond with JSON:
 {
@@ -457,7 +464,7 @@ Respond with JSON:
       "question": "...",
       "options": ["A", "B", "C"],
       "correctIndex": 0,
-      "explanation": "A brief, encouraging explanation",
+      "explanation": "A brief, encouraging explanation that references what the narration said",
       "ageGroup": "young" | "older" | "family"
     }
   ]
@@ -465,12 +472,14 @@ Respond with JSON:
 
 Create 2 questions for each age group (6 total).
 
-IMPORTANT RULES:
-- "young" questions (ages 4-6): Use simple Yes/No format with options ["Yes", "No"]. Frame the question so "Yes" or "No" is the answer. NEVER use "True/False". Keep language very simple.
-- "older" questions (ages 7-10): Multiple choice with 3 text options. Questions should be straightforward and age-appropriate.
-- "family" questions (ages 11+): Multiple choice with 3 text options. Can be deeper and more reflective.
-- ALL questions must be answerable from the narration text alone. NEVER ask the user to identify, compare, or choose between images, pictures, illustrations, or visual elements. The quiz is text-only — the user cannot see any images while answering.
-- NEVER reference "which picture" or "which image" or ask users to compare visual options.`,
+QUESTION STYLE RULES:
+- "young" questions (ages 4-6): Use simple Yes/No format with options ["Yes", "No"]. Frame the question so "Yes" or "No" is the answer. NEVER use "True/False". Keep language very simple. Base these on the "Young version" narration.
+- "older" questions (ages 7-10): Multiple choice with 3 text options. Questions should be straightforward and age-appropriate. Base these on the "Older version" narration.
+- "family" questions (ages 11+): Multiple choice with 3 text options. Can be deeper and more reflective. Base these on the "Family version" narration.
+- ALL questions must be answerable from the narration text alone. NEVER ask about details not explicitly covered in the narration.
+- NEVER reference images, pictures, illustrations, or visual elements.
+- NEVER reference "which picture" or "which image" or ask users to compare visual options.
+- Explanations should reinforce the lesson by quoting or paraphrasing what the narration actually said.`,
       },
       { role: "user", content: content },
     ],
