@@ -136,7 +136,7 @@ export default function SceneViewer({ scene, sceneIndex, totalScenes, ageGroup, 
 
   useEffect(() => {
     if (!hasVideo) {
-      const fallbackTimer = setTimeout(() => setVideoDone(true), 12000);
+      const fallbackTimer = setTimeout(() => setVideoDone(true), 8000);
       return () => clearTimeout(fallbackTimer);
     }
   }, [hasVideo, sceneIndex]);

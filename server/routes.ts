@@ -290,7 +290,7 @@ export async function registerRoutes(server: Server, app: Express) {
 // ============================================
 
 const SORA_MODEL = process.env.SORA_MODEL || "sora-2";
-const SORA_VIDEO_SECONDS = process.env.SORA_VIDEO_SECONDS || "12";
+const SORA_VIDEO_SECONDS = process.env.SORA_VIDEO_SECONDS || "8";
 const VIDEOS_DIR = path.resolve("generated", "videos");
 fs.mkdirSync(VIDEOS_DIR, { recursive: true });
 

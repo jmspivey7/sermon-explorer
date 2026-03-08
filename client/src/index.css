@@ -47,10 +47,10 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
-.ken-zoom-in { animation: ken-zoom-in 12s ease-out forwards; }
-.ken-zoom-out { animation: ken-zoom-out 12s ease-out forwards; }
-.ken-pan-left { animation: ken-pan-left 12s ease-in-out forwards; }
-.ken-pan-right { animation: ken-pan-right 12s ease-in-out forwards; }
+.ken-zoom-in { animation: ken-zoom-in 8s ease-out forwards; }
+.ken-zoom-out { animation: ken-zoom-out 8s ease-out forwards; }
+.ken-pan-left { animation: ken-pan-left 8s ease-in-out forwards; }
+.ken-pan-right { animation: ken-pan-right 8s ease-in-out forwards; }
 .ken-fade { animation: ken-fade 8s ease-out forwards; }
 
 @keyframes typewriter {
